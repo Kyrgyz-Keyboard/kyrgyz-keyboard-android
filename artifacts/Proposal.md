@@ -1,31 +1,37 @@
-Idea
+<h1 align="center">Kyrgyz Keyboard with AI-Powered Features</h1>
 
-Develop a user-friendly Kyrgyz keyboard application with AI-powered additional features like: predictive text (T9), grammar checker, paraphrasing in order to promote the Kyrgyz language in digital communication.
+## Idea
 
-Problem
+Develop a user-friendly Kyrgyz keyboard application with AI-powered features such as predictive text (T9), a grammar checker, and a paraphrasing tool to promote the Kyrgyz language in digital communication.
 
-Current Kyrgyz system keyboards are the copy of Russian one with no specific letters and requiring users to long-press keys for Kyrgyz letters (e.g., ң, ө, ү). This discourages proper Kyrgyz spelling.
-In addition, the lack of T9/autocorrect leads to typos and informal shortcuts (e.g., "курут" → "курки") or simply, don’t show anything. That’s why, users default to Russian for convenience, eroding Kyrgyz language use in tech.
+## Problem
 
-Product Results
+Current Kyrgyz system keyboards are copies of the Russian layout, lacking dedicated Kyrgyz letters. Users must long-press keys to access Kyrgyz-specific characters (e.g., ң, ө, ү), making correct spelling inconvenient.
 
-Comfortable Layout: Optimized Kyrgyz keyboard layout with all letters accessible via one single taps.
-Predictive Text (T9): AI-driven word suggestions and autocorrect.
-Grammar Hints: Real-time grammar/spelling corrections.
-Paraphrasing Tool: Rewrite sentences using AkylAI (the kyrgyz AI assistant) or a custom NLP model.
-User Experience: Customizable themes, emojis, and stickers for better interaction between the users.
+Additionally, the absence of T9/autocorrect leads to typos and informal shortcuts (e.g., "курут" → "курки") or, in some cases, fails to provide suggestions. As a result, users default to Russian for convenience, further eroding Kyrgyz language usage in digital spaces.
 
-Learning Value
+## Product Features
 
-Mobile Development: Kotlin (Android) / Swift (iOS) for keyboard integration.
-AI/ML: Python with TensorFlow/PyTorch for NLP models (predictive text, grammar checks).
-NLP Tools: Libraries like spaCy for Kyrgyz language processing.
-Cloud: AWS/Google Cloud for AI model deployment.
-Potential Problems
-Are there any Kyrgyz keyboards already?
-Only by the phone system ones and they are likely limited to basic layouts without any hints. As a customizable keyboard - “Facemoji” app but with only English layout.
+- **Comfortable Layout**: Optimized Kyrgyz keyboard layout with all letters accessible via single taps.
+- **Predictive Text (T9)**: AI-driven word suggestions and autocorrect.
+- **Grammar Checker**: Real-time spelling and grammar corrections.
+- **Paraphrasing Tool**: Rewrite sentences using AkylAI (the Kyrgyz AI assistant) or a custom NLP model.
+- **Enhanced User Experience**: Customizable themes, emojis, and stickers for improved interaction.
 
-Linguistic Challenges:
-Kyrgyz is an agglutinative language, complicating NLP models.
-Lack of online information in Kyrgyz for datasets
-Dialect variations (Northern vs. Southern Kyrgyz).
+## Learning Value
+
+- **Mobile Development**: Kotlin (Android) / Swift (iOS) for keyboard integration.
+- **AI/ML**: Python with TensorFlow/PyTorch for NLP models (predictive text, grammar correction).
+- **NLP Tools**: Libraries like spaCy for Kyrgyz language processing.
+- **Cloud Deployment**: AWS/Google Cloud for AI model hosting.
+
+## Potential Challenges
+
+#### Existing Kyrgyz Keyboards
+- The only available options are system keyboards with basic layouts and no AI-powered features.
+- The "Facemoji" app offers customization but supports only English, with no Kyrgyz layout.
+
+#### Linguistic Challenges
+- **Agglutinative structure**: Kyrgyz word formation complicates NLP model development.
+- **Limited datasets**: There is a lack of online linguistic resources in Kyrgyz.
+- **Dialect variations**: Differences between Northern and Southern Kyrgyz may affect language modeling.
