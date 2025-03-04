@@ -5,7 +5,6 @@
    - list of
 
 3. How to implement predictive Keyboard?
-   Artifacts:
      - List of suitable approaches based on experts consultations or papers
      - High level description of the baseline algorithm
 
