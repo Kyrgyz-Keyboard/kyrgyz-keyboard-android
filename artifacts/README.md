@@ -1,5 +1,5 @@
 1. How should the Keyboard layout look like?
-   - UI/UX Prototype in Figma
+   - UI/UX Prototype on Figma
    
 3. What data do we have?
    - s
