@@ -12,6 +12,9 @@ Suggested techniques:
 
 # Step 3: Word prediction
 
+Lectures:
+- [NLP Spring 2025 @ Neapolis University Pafos](https://www.youtube.com/playlist?list=PLQsQ42jQ8PJG4NbPqizxqRBWeQAzPZ_GY)
+
 Articles:
 - (RU, Yandex) [How a Tiny Neuro-Language Model in Keyboard Beats Server-Side Hints](https://habr.com/ru/companies/yandex/articles/751598/)
 - [How Predictive Text Algorithm Works: All Secrets of Deep Learning](https://www.fleksy.com/blog/how-predictive-text-algorithm-works-all-secrets-of-deep-learning/)
