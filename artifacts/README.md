@@ -1,6 +1,6 @@
 # Step 1: Layout
 
-- UI/UX Prototype on [Figma]([url](https://www.figma.com/design/1adSebiLWoW548ghoPmZVA/Untitled?node-id=0-1&t=cXiBsvMSrw8kXwjj-1))
+- UI/UX Prototype on [Figma](https://www.figma.com/design/1adSebiLWoW548ghoPmZVA/Untitled?node-id=0-1&t=cXiBsvMSrw8kXwjj-1)
 
 # Step 2: Word autocompletion
 
