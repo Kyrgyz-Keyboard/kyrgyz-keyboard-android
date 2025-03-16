@@ -12,6 +12,8 @@ Suggested techniques:
 
 # Step 3: Word prediction
 
+[LOUDS Succinct Tree (Trie)](https://www.cs.le.ac.uk/people/ond1/XMLcomp/confersWEA06_LOUDS.pdf)
+
 Lectures:
 - [NLP Spring 2025 @ Neapolis University Pafos](https://www.youtube.com/playlist?list=PLQsQ42jQ8PJG4NbPqizxqRBWeQAzPZ_GY)
 
