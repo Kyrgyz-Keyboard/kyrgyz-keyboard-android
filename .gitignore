@@ -1,2 +1,11 @@
 # JetBrains IDE
 /.idea/
+
+# Kotlin
+/.kotlin/
+
+# Gradle
+/.gradle/
+
+# Other local files
+/local.properties
