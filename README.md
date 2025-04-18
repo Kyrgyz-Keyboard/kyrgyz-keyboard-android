@@ -1,1 +1,1 @@
-# kyrgyz-kerboard-android
+# kyrgyz-keyboard-android
