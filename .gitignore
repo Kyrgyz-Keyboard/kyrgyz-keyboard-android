@@ -9,3 +9,6 @@
 
 # Other local files
 /local.properties
+
+# Build
+/build/
