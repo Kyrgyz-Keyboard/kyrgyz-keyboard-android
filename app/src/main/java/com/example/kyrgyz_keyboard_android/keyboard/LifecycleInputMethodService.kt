@@ -1,4 +1,4 @@
-package com.example.kyrgyz_keyboard_android
+package com.example.kyrgyz_keyboard_android.keyboard
 
 import android.content.Intent
 import android.inputmethodservice.InputMethodService
