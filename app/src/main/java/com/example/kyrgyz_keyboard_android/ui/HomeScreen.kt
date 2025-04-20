@@ -1,10 +1,10 @@
 package com.example.kyrgyz_keyboard_android.ui
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,13 +16,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -36,12 +39,16 @@ import com.example.kyrgyz_keyboard_android.keyboard.KeyboardLayout
 import com.example.kyrgyz_keyboard_android.keyboard.KyrgyzKeyboardIME
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyGray
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyboardGray
+import kotlinx.coroutines.delay
 
 enum class CapsLockState { OFF, TEMPORARY, LOCKED }
 
 @Composable
 fun HomeScreen() {
     var capsLockEnabled by remember { mutableStateOf(CapsLockState.TEMPORARY) }
+    LaunchedEffect(capsLockEnabled) {
+        Log.d("CapsLock", "State changed to: $capsLockEnabled")
+    }
     KeyboardLayout(capsLockEnabled = capsLockEnabled) { newState ->
         capsLockEnabled = newState
     }
@@ -129,7 +136,26 @@ private fun KeyButton(
     onCapsLockChanged: (CapsLockState) -> Unit
 ) {
     val context = LocalContext.current
-    val interactionSource = remember { MutableInteractionSource() }
+
+    var isBackspacePressed by remember { mutableStateOf(false) }
+    var deleteSpeed by remember { mutableLongStateOf(250L) }
+
+    LaunchedEffect(isBackspacePressed) {
+        if (isBackspacePressed && key.img == R.drawable.ic_remove) {
+            handleKeyClick(key, capsLockEnabled, context, onCapsLockChanged)
+            var iterations = 0
+            while (isBackspacePressed) {
+                delay(deleteSpeed)
+                handleKeyClick(key, capsLockEnabled, context, onCapsLockChanged)
+                iterations++
+                deleteSpeed = when {
+                    iterations < 5 -> (deleteSpeed * 0.7f).toLong().coerceAtLeast(20L)
+                    else -> (deleteSpeed * 0.9f).toLong().coerceAtLeast(20L)
+                }
+            }
+            deleteSpeed = 250L
+        }
+    }
 
     Box(
         modifier = modifier
@@ -140,11 +166,21 @@ private fun KeyButton(
                     else -> Color.White
                 }, shape = RoundedCornerShape(4.dp)
             )
-            .clickable(
-                interactionSource = interactionSource, indication = null
-            ) {
-                onClick(key)
-                handleKeyClick(key, capsLockEnabled, context, onCapsLockChanged)
+            .pointerInput(key, capsLockEnabled) {
+                detectTapGestures(onPress = {
+                    if (key.img == R.drawable.ic_remove) {
+                        tryAwaitRelease()
+                        isBackspacePressed = false
+                        deleteSpeed = 250L
+                    }
+                }, onTap = {
+                    onClick(key)
+                    handleKeyClick(key, capsLockEnabled, context, onCapsLockChanged)
+                }, onLongPress = {
+                    if (key.img == R.drawable.ic_remove) {
+                        isBackspacePressed = true
+                    }
+                })
             }, contentAlignment = Alignment.Center
     ) {
         KeyContent(key = key, capsLockEnabled = capsLockEnabled)
@@ -201,7 +237,7 @@ private fun handleKeyClick(
         !key.isSpecial && key.ch != null -> {
             val textToCommit =
                 if (capsLockEnabled == CapsLockState.TEMPORARY || capsLockEnabled == CapsLockState.LOCKED) key.ch.uppercase()
-                else key.ch
+                else key.ch.lowercase()
             inputConnection?.commitText(textToCommit, textToCommit.length)
             if (capsLockEnabled == CapsLockState.TEMPORARY) {
                 onCapsLockChanged(CapsLockState.OFF)
