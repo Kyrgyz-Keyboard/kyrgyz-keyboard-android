@@ -1,13 +1,14 @@
 package com.example.kyrgyz_keyboard_android.keyboard
 
 import com.example.kyrgyz_keyboard_android.R
+import com.example.kyrgyz_keyboard_android.ui.CapsLockState
 
 data class KeyUiModel(
     val isSpecial: Boolean = false,
     val ch: String? = null,
     val img: Int? = null,
     val weight: Float = 1f,
-    val isActive: Boolean = false
+    var isActive: CapsLockState = CapsLockState.OFF
 )
 
 object KeyboardLayout {
@@ -72,6 +73,7 @@ object KeyboardLayout {
         KeyUiModel(isSpecial = true, img = R.drawable.ic_more, weight = 1.5f),
         KeyUiModel(ch = ","),
         KeyUiModel(ch = "аралык", weight = 5f),
-        KeyUiModel(ch = ".")
+        KeyUiModel(ch = "."),
+        KeyUiModel(ch = "<-", weight = 2f)
     )
 }
