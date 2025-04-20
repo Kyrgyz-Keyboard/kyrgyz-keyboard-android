@@ -62,7 +62,8 @@ private fun KeyboardLayout(
         modifier = Modifier
             .background(color = KeyboardGray)
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(bottom = 56.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         with(KeyboardLayout) {
             KeyboardRow(keys = row2, capsLockEnabled, onCapsLockChanged)
@@ -119,7 +120,7 @@ private fun CapsLockRow(
     ) { key ->
         if (key.img == R.drawable.ic_caps) {
             when (capsLockEnabled) {
-                CapsLockState.TEMPORARY -> onCapsLockChanged(CapsLockState.LOCKED)
+                CapsLockState.TEMPORARY -> onCapsLockChanged(CapsLockState.OFF)
                 CapsLockState.LOCKED -> onCapsLockChanged(CapsLockState.OFF)
                 CapsLockState.OFF -> onCapsLockChanged(CapsLockState.TEMPORARY)
             }
@@ -138,7 +139,7 @@ private fun KeyButton(
     val context = LocalContext.current
 
     var isBackspacePressed by remember { mutableStateOf(false) }
-    var deleteSpeed by remember { mutableLongStateOf(250L) }
+    var deleteSpeed by remember { mutableLongStateOf(150L) }
 
     LaunchedEffect(isBackspacePressed) {
         if (isBackspacePressed && key.img == R.drawable.ic_remove) {
@@ -171,7 +172,7 @@ private fun KeyButton(
                     if (key.img == R.drawable.ic_remove) {
                         tryAwaitRelease()
                         isBackspacePressed = false
-                        deleteSpeed = 250L
+                        deleteSpeed = 150L
                     }
                 }, onTap = {
                     onClick(key)
@@ -179,6 +180,17 @@ private fun KeyButton(
                 }, onLongPress = {
                     if (key.img == R.drawable.ic_remove) {
                         isBackspacePressed = true
+                    }
+                    if (key.img == R.drawable.ic_caps) {
+                        onCapsLockChanged(CapsLockState.LOCKED)
+                    }
+                }, onDoubleTap = {
+                    if (key.img == R.drawable.ic_caps
+                        && (capsLockEnabled == CapsLockState.TEMPORARY
+                                || capsLockEnabled == CapsLockState.OFF)) {
+                        onCapsLockChanged(CapsLockState.LOCKED)
+                    } else {
+                        onCapsLockChanged(CapsLockState.OFF)
                     }
                 })
             }, contentAlignment = Alignment.Center
