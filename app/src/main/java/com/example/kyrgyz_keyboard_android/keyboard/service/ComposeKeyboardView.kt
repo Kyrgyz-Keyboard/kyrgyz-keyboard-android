@@ -1,4 +1,4 @@
-package com.example.kyrgyz_keyboard_android.keyboard
+package com.example.kyrgyz_keyboard_android.keyboard.service
 
 import android.content.Context
 import androidx.compose.runtime.Composable
