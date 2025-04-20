@@ -1,7 +1,6 @@
-package com.example.kyrgyz_keyboard_android.keyboard
+package com.example.kyrgyz_keyboard_android.keyboard.model
 
 import com.example.kyrgyz_keyboard_android.R
-import com.example.kyrgyz_keyboard_android.ui.CapsLockState
 
 data class KeyUiModel(
     val isSpecial: Boolean = false,

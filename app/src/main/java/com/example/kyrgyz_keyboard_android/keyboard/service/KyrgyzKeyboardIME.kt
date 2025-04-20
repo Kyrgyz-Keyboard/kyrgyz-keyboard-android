@@ -1,4 +1,4 @@
-package com.example.kyrgyz_keyboard_android.keyboard
+package com.example.kyrgyz_keyboard_android.keyboard.service
 
 import android.view.View
 import android.view.inputmethod.InputConnection
@@ -12,6 +12,8 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.example.kyrgyz_keyboard_android.R
+import com.example.kyrgyz_keyboard_android.keyboard.ComposeKeyboardView
+import com.example.kyrgyz_keyboard_android.keyboard.LifecycleInputMethodService
 
 class KyrgyzKeyboardIME() : LifecycleInputMethodService(), ViewModelStoreOwner,
     SavedStateRegistryOwner {

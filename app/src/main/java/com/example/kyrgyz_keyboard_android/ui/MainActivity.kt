@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyTextSize
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +41,7 @@ fun KeyboardSettingsScreen() {
             .fillMaxSize()
             .padding(16.dp), verticalArrangement = Arrangement.Center
     ) {
-        Text("Enable and select the Kyrgyz Keyboard", fontSize = 18.sp)
+        Text("Enable and select the Kyrgyz Keyboard", fontSize = keyTextSize)
 
         Spacer(modifier = Modifier.height(20.dp))
 
