@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,13 +41,24 @@ fun KeyButton(
 ) {
     val context = LocalContext.current
     var isBackspacePressed by remember { mutableStateOf(false) }
-    var deleteSpeed by remember { mutableLongStateOf(INITIAL_DELETE_SPEED) }
 
     LaunchedEffect(isBackspacePressed) {
         if (isBackspacePressed && key.img == R.drawable.ic_remove) {
-            handleBackspacePress(key, capsLockEnabled, context, onCapsLockChanged) {
-                isBackspacePressed = false
-                deleteSpeed = INITIAL_DELETE_SPEED
+            var iterations = 0
+            var currentSpeed = INITIAL_DELETE_SPEED
+
+            handleKeyClick(key, capsLockEnabled, context, onCapsLockChanged)
+
+            while (isBackspacePressed) {
+                delay(currentSpeed)
+                handleKeyClick(key, capsLockEnabled, context, onCapsLockChanged)
+                iterations++
+
+                currentSpeed = if (iterations < INITIAL_SPEED_PHASE_ITERATIONS) {
+                    (currentSpeed * SPEED_DECREASE_FACTOR_INITIAL).toLong().coerceAtLeast(MIN_DELETE_SPEED)
+                } else {
+                    (currentSpeed * SPEED_DECREASE_FACTOR_NORMAL).toLong().coerceAtLeast(MIN_DELETE_SPEED)
+                }
             }
         }
     }
@@ -56,66 +66,45 @@ fun KeyButton(
     Box(
         modifier = modifier
             .background(
-                color = getBackgroundColor(key, capsLockEnabled),
+                color = getBackgroundColor(key),
                 shape = RoundedCornerShape(keyCornerRadius)
             )
             .pointerInput(key, capsLockEnabled) {
                 detectTapGestures(
-                    onPress = { handlePress(key) { isBackspacePressed = false } },
+                    onPress = {
+                        if (key.img == R.drawable.ic_remove) {
+                            isBackspacePressed = true
+                            tryAwaitRelease()
+                            isBackspacePressed = false
+                        } else {
+                            handleKeyClick(key, capsLockEnabled, context, onCapsLockChanged)
+                        }
+                    },
                     onTap = {
-                        handleTap(
-                            key, capsLockEnabled, context, onClick, onCapsLockChanged
-                        )
+                        if (key.img == R.drawable.ic_caps || key.isSpecial) {
+                            handleTap(key, capsLockEnabled, context, onClick, onCapsLockChanged)
+                        }
                     },
                     onLongPress = {
                         handleLongPress(key, onCapsLockChanged) {
-                            isBackspacePressed = true
+                            if (key.img == R.drawable.ic_remove) {
+                                isBackspacePressed = true
+                            }
                         }
                     },
-                    onDoubleTap = { handleDoubleTap(key, capsLockEnabled, onCapsLockChanged) })
-            }, contentAlignment = Alignment.Center
+                    onDoubleTap = { handleDoubleTap(key, capsLockEnabled, onCapsLockChanged) }
+                )
+            },
+        contentAlignment = Alignment.Center
     ) {
         KeyContent(key = key, capsLockEnabled = capsLockEnabled)
     }
 }
 
-private fun getBackgroundColor(key: KeyUiModel, capsLockEnabled: CapsLockState): Color = when {
+private fun getBackgroundColor(key: KeyUiModel): Color = when {
     key.isActive == CapsLockState.LOCKED -> KeyLockedBackgroundColor
     key.isSpecial -> KeyGray
     else -> KeyBackgroundColor
-}
-
-private suspend fun handleBackspacePress(
-    key: KeyUiModel,
-    capsLockEnabled: CapsLockState,
-    context: Context,
-    onCapsLockChanged: (CapsLockState) -> Unit,
-    onComplete: () -> Unit
-) {
-    handleKeyClick(key, capsLockEnabled, context, onCapsLockChanged)
-    var iterations = 0
-    var currentSpeed = INITIAL_DELETE_SPEED
-
-    while (true) {
-        delay(currentSpeed)
-        handleKeyClick(key, capsLockEnabled, context, onCapsLockChanged)
-        iterations++
-
-        val speedFactor = if (iterations < INITIAL_SPEED_PHASE_ITERATIONS) {
-            SPEED_DECREASE_FACTOR_INITIAL
-        } else {
-            SPEED_DECREASE_FACTOR_NORMAL
-        }
-
-        currentSpeed = (currentSpeed * speedFactor).toLong().coerceAtLeast(MIN_DELETE_SPEED)
-    }
-    onComplete()
-}
-
-private fun handlePress(key: KeyUiModel, onBackspaceRelease: () -> Unit) {
-    if (key.img == R.drawable.ic_remove) {
-        onBackspaceRelease()
-    }
 }
 
 private fun handleTap(
