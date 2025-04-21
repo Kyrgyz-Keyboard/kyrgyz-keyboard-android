@@ -13,5 +13,5 @@ object Dimensions {
     val keyCornerRadius = 4.dp
     val keyContentPadding = 5.dp
     val keyIconSize = 24.dp
-    val keyTextSize = 18.sp
+    val keyTextSize = 24.sp
 }

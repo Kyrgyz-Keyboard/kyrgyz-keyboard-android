@@ -1,6 +1,5 @@
 package com.example.kyrgyz_keyboard_android.ui.keyboard.components
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -20,6 +19,8 @@ import com.example.kyrgyz_keyboard_android.R
 import com.example.kyrgyz_keyboard_android.keyboard.input.handleKeyClick
 import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import com.example.kyrgyz_keyboard_android.keyboard.model.KeyUiModel
+import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
+import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants
 import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.INITIAL_DELETE_SPEED
 import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.INITIAL_SPEED_PHASE_ITERATIONS
 import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.MIN_DELETE_SPEED
@@ -36,8 +37,7 @@ fun KeyButton(
     modifier: Modifier = Modifier,
     key: KeyUiModel,
     capsLockEnabled: CapsLockState,
-    onClick: (KeyUiModel) -> Unit,
-    onCapsLockChanged: (CapsLockState) -> Unit
+    viewModel: KeyboardViewModel
 ) {
     val context = LocalContext.current
     var isBackspacePressed by remember { mutableStateOf(false) }
@@ -47,17 +47,21 @@ fun KeyButton(
             var iterations = 0
             var currentSpeed = INITIAL_DELETE_SPEED
 
-            handleKeyClick(key, capsLockEnabled, context, onCapsLockChanged)
+            handleKeyClick(key, capsLockEnabled, context, viewModel)
+            viewModel.onBackspace()
 
             while (isBackspacePressed) {
                 delay(currentSpeed)
-                handleKeyClick(key, capsLockEnabled, context, onCapsLockChanged)
+                handleKeyClick(key, capsLockEnabled, context, viewModel)
+                viewModel.onBackspace()
                 iterations++
 
                 currentSpeed = if (iterations < INITIAL_SPEED_PHASE_ITERATIONS) {
-                    (currentSpeed * SPEED_DECREASE_FACTOR_INITIAL).toLong().coerceAtLeast(MIN_DELETE_SPEED)
+                    (currentSpeed * SPEED_DECREASE_FACTOR_INITIAL).toLong()
+                        .coerceAtLeast(MIN_DELETE_SPEED)
                 } else {
-                    (currentSpeed * SPEED_DECREASE_FACTOR_NORMAL).toLong().coerceAtLeast(MIN_DELETE_SPEED)
+                    (currentSpeed * SPEED_DECREASE_FACTOR_NORMAL).toLong()
+                        .coerceAtLeast(MIN_DELETE_SPEED)
                 }
             }
         }
@@ -77,27 +81,33 @@ fun KeyButton(
                             tryAwaitRelease()
                             isBackspacePressed = false
                         } else {
-                            handleKeyClick(key, capsLockEnabled, context, onCapsLockChanged)
-                        }
-                    },
-                    onTap = {
-                        if (key.img == R.drawable.ic_caps || key.isSpecial) {
-                            handleTap(key, capsLockEnabled, context, onClick, onCapsLockChanged)
-                        }
-                    },
-                    onLongPress = {
-                        handleLongPress(key, onCapsLockChanged) {
-                            if (key.img == R.drawable.ic_remove) {
-                                isBackspacePressed = true
+                            handleKeyClick(key, capsLockEnabled, context, viewModel)
+                            if (!key.isSpecial && key.ch != null) {
+                                viewModel.onTextInput(key.ch)
+                            }
+                            if (key.ch == KeyboardConstants.SPACE_CHARACTER) {
+                                viewModel.onWordComplete()
                             }
                         }
                     },
-                    onDoubleTap = { handleDoubleTap(key, capsLockEnabled, onCapsLockChanged) }
+                    onTap = {
+                        if (key.img == R.drawable.ic_caps) {
+                            when (capsLockEnabled) {
+                                CapsLockState.OFF -> viewModel.updateCapsLockState(CapsLockState.TEMPORARY)
+                                else -> viewModel.updateCapsLockState(CapsLockState.OFF)
+                            }
+                        }
+                    },
+                    onDoubleTap = {
+                        if (key.img == R.drawable.ic_caps) {
+                            viewModel.updateCapsLockState(CapsLockState.LOCKED)
+                        }
+                    }
                 )
             },
         contentAlignment = Alignment.Center
     ) {
-        KeyContent(key = key, capsLockEnabled = capsLockEnabled)
+        KeyContent(key = key, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
     }
 }
 
@@ -105,38 +115,4 @@ private fun getBackgroundColor(key: KeyUiModel): Color = when {
     key.isActive == CapsLockState.LOCKED -> KeyLockedBackgroundColor
     key.isSpecial -> KeyGray
     else -> KeyBackgroundColor
-}
-
-private fun handleTap(
-    key: KeyUiModel,
-    capsLockEnabled: CapsLockState,
-    context: Context,
-    onClick: (KeyUiModel) -> Unit,
-    onCapsLockChanged: (CapsLockState) -> Unit
-) {
-    onClick(key)
-    handleKeyClick(key, capsLockEnabled, context, onCapsLockChanged)
-}
-
-private fun handleLongPress(
-    key: KeyUiModel, onCapsLockChanged: (CapsLockState) -> Unit, onBackspaceStart: () -> Unit
-) {
-    when (key.img) {
-        R.drawable.ic_remove -> onBackspaceStart()
-        R.drawable.ic_caps -> onCapsLockChanged(CapsLockState.LOCKED)
-    }
-}
-
-private fun handleDoubleTap(
-    key: KeyUiModel, capsLockEnabled: CapsLockState, onCapsLockChanged: (CapsLockState) -> Unit
-) {
-    if (key.img == R.drawable.ic_caps) {
-        when {
-            capsLockEnabled == CapsLockState.TEMPORARY || capsLockEnabled == CapsLockState.OFF -> onCapsLockChanged(
-                CapsLockState.LOCKED
-            )
-
-            else -> onCapsLockChanged(CapsLockState.OFF)
-        }
-    }
 }

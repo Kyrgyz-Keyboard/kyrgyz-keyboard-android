@@ -1,20 +1,23 @@
 package com.example.kyrgyz_keyboard_android.ui.keyboard
 
-import android.util.Log
+import SuggestionsRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
-import com.example.kyrgyz_keyboard_android.keyboard.model.KeyboardLayout
+import com.example.kyrgyz_keyboard_android.keyboard.model.KeyboardLayout.row1
+import com.example.kyrgyz_keyboard_android.keyboard.model.KeyboardLayout.row2
+import com.example.kyrgyz_keyboard_android.keyboard.model.KeyboardLayout.row3
+import com.example.kyrgyz_keyboard_android.keyboard.model.KeyboardLayout.row4
+import com.example.kyrgyz_keyboard_android.keyboard.model.KeyboardLayout.row5
+import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
 import com.example.kyrgyz_keyboard_android.ui.keyboard.components.CapsLockRow
 import com.example.kyrgyz_keyboard_android.ui.keyboard.components.KeyboardRow
 import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyboardBottomPadding
@@ -23,19 +26,33 @@ import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyboardVerticalP
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyboardGray
 
 @Composable
-fun HomeScreen() {
-    var capsLockEnabled by remember { mutableStateOf(CapsLockState.TEMPORARY) }
-    LaunchedEffect(capsLockEnabled) {
-        Log.d("CapsLock", "State changed to: $capsLockEnabled")
-    }
-    KeyboardLayout(capsLockEnabled = capsLockEnabled) { newState ->
-        capsLockEnabled = newState
+fun HomeScreen(viewModel: KeyboardViewModel = viewModel()) {
+    val capsLockEnabled by viewModel.capsLockState.collectAsState()
+    val suggestions by viewModel.suggestions.collectAsState()
+    val currentWord by viewModel.currentWord.collectAsState()
+    val recentWords by viewModel.recentWords.collectAsState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(KeyboardGray)
+    ) {
+        if (suggestions.isNotEmpty() || recentWords.isNotEmpty()) {
+            SuggestionsRow(
+                suggestions = if (currentWord.isEmpty()) recentWords else suggestions,
+                viewModel = viewModel
+            )
+        }
+
+        KeyboardLayout(
+            capsLockEnabled = capsLockEnabled, viewModel = viewModel
+        )
     }
 }
 
 @Composable
-private fun KeyboardLayout(
-    capsLockEnabled: CapsLockState, onCapsLockChanged: (CapsLockState) -> Unit
+fun KeyboardLayout(
+    capsLockEnabled: CapsLockState, viewModel: KeyboardViewModel
 ) {
     Column(
         modifier = Modifier
@@ -44,16 +61,11 @@ private fun KeyboardLayout(
             .padding(bottom = keyboardBottomPadding)
             .padding(horizontal = keyboardHorizontalPadding, vertical = keyboardVerticalPadding)
     ) {
-        with(KeyboardLayout) {
-            KeyboardRow(keys = row2, capsLockEnabled, onCapsLockChanged)
-            KeyboardRow(keys = row3, capsLockEnabled, onCapsLockChanged)
-            CapsLockRow(
-                keys = row4,
-                capsLockEnabled = capsLockEnabled,
-                onCapsLockChanged = onCapsLockChanged
-            )
-            KeyboardRow(keys = row5, capsLockEnabled, onCapsLockChanged)
-        }
+        KeyboardRow(keys = row1, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
+        KeyboardRow(keys = row2, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
+        KeyboardRow(keys = row3, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
+        CapsLockRow(keys = row4, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
+        KeyboardRow(keys = row5, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
     }
 }
 
