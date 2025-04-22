@@ -44,13 +44,13 @@ jobs:
 
       - name: Rename Debug APK
         working-directory: app/build/outputs/apk/debug
-        run: mv app-debug.apk Kyrgyz-Keyboard-debug.apk
+        run: mv app-debug.apk Kyrgyz-Keyboard.apk
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: Debug APK
-          path: app/build/outputs/apk/debug/Kyrgyz-Keyboard-debug.apk
+          path: app/build/outputs/apk/debug/Kyrgyz-Keyboard.apk
 
       # ----------------------------------------------------------------------
 
@@ -59,10 +59,10 @@ jobs:
 
       - name: Rename Release APK
         working-directory: app/build/outputs/apk/release
-        run: mv app-release-unsigned.apk Kyrgyz-Keyboard.apk
+        run: mv app-release-unsigned.apk Kyrgyz-Keyboard-release.apk
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
           name: Release APK
-          path: app/build/outputs/apk/release/Kyrgyz-Keyboard.apk
+          path: app/build/outputs/apk/release/Kyrgyz-Keyboard-release.apk
