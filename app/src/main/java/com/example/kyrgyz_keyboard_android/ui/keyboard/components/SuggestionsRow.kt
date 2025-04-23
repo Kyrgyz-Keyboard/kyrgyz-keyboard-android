@@ -20,6 +20,9 @@ import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyboardHorizonta
 import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyboardVerticalPadding
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyboardGray
 import com.example.kyrgyz_keyboard_android.ui.theme.keyboardTextStyle
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.ui.Alignment
 
 @Composable
 fun SuggestionsRow(
@@ -29,11 +32,13 @@ fun SuggestionsRow(
     isMidWord: Boolean = false
 ) {
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(KeyboardGray)
-            .padding(horizontal = keyboardHorizontalPadding, vertical = keyboardVerticalPadding),
+            .padding(horizontal = keyboardHorizontalPadding, vertical = keyboardVerticalPadding)
+            .horizontalScroll(scrollState),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         suggestions.forEach { suggestion ->
@@ -51,7 +56,8 @@ fun SuggestionChip(text: String, onClick: () -> Unit) {
         modifier = Modifier
             .clip(RoundedCornerShape(keyCornerRadius))
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+            contentAlignment = Alignment.Center
     ) {
         Text(
             text = text, style = keyboardTextStyle, color = Color.DarkGray
