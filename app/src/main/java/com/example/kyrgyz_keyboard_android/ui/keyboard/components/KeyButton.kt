@@ -89,7 +89,7 @@ fun KeyButton(
                 }, onDoubleTap = {
                     if (key.img == R.drawable.ic_caps && capsLockEnabled != CapsLockState.LOCKED) {
                         viewModel.updateCapsLockState(CapsLockState.LOCKED)
-                    } else {
+                    } else if (key.img == R.drawable.ic_caps && capsLockEnabled == CapsLockState.LOCKED) {
                         viewModel.updateCapsLockState(CapsLockState.OFF)
                     }
                 })
