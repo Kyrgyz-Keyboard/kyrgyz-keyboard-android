@@ -14,5 +14,7 @@ object Dimensions {
     val keyContentPadding = 5.dp
     val keyIconSize = 24.dp
     val keyTextSize = 24.sp
+    val suggestionsHorizontalPadding = 12.dp
+    val suggestionsVerticalPadding = 8.dp
     val symbolsBtnTextSize = 18.sp
 }

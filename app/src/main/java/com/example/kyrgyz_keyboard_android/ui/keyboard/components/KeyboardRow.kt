@@ -10,9 +10,7 @@ import androidx.compose.ui.Modifier
 import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import com.example.kyrgyz_keyboard_android.keyboard.model.KeyUiModel
 import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
-import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyHeight
-import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keySpacing
-import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyVerticalPadding
+import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions
 
 @Composable
 fun KeyboardRow(
@@ -21,14 +19,14 @@ fun KeyboardRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = keyVerticalPadding),
-        horizontalArrangement = Arrangement.spacedBy(keySpacing)
+            .padding(vertical = Dimensions.keyVerticalPadding),
+        horizontalArrangement = Arrangement.spacedBy(Dimensions.keySpacing)
     ) {
         keys.forEach { key ->
             KeyButton(
                 modifier = Modifier
                     .weight(key.weight)
-                    .height(keyHeight),
+                    .height(Dimensions.keyHeight),
                 key = key,
                 capsLockEnabled = capsLockEnabled,
                 viewModel = viewModel

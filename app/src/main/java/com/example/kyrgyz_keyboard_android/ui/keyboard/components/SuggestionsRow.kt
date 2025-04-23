@@ -12,17 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.example.kyrgyz_keyboard_android.keyboard.input.handleSuggestionClick
 import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
-import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyCornerRadius
-import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyboardHorizontalPadding
-import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyboardVerticalPadding
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyboardGray
 import com.example.kyrgyz_keyboard_android.ui.theme.keyboardTextStyle
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Alignment
+import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions
 
 @Composable
 fun SuggestionsRow(
@@ -37,7 +34,7 @@ fun SuggestionsRow(
         modifier = modifier
             .fillMaxWidth()
             .background(KeyboardGray)
-            .padding(horizontal = keyboardHorizontalPadding, vertical = keyboardVerticalPadding)
+            .padding(horizontal = Dimensions.keyboardHorizontalPadding, vertical = Dimensions.keyboardVerticalPadding)
             .horizontalScroll(scrollState),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
@@ -54,9 +51,9 @@ fun SuggestionsRow(
 fun SuggestionChip(text: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(keyCornerRadius))
+            .clip(RoundedCornerShape(Dimensions.keyCornerRadius))
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = Dimensions.suggestionsHorizontalPadding, vertical = Dimensions.suggestionsVerticalPadding),
             contentAlignment = Alignment.Center
     ) {
         Text(

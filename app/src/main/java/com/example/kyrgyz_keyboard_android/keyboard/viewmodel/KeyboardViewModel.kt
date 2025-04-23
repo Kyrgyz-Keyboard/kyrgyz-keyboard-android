@@ -2,7 +2,7 @@ package com.example.kyrgyz_keyboard_android.keyboard.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kyrgyz_keyboard_android.keyboard.DummyPredictiveEngine
+import com.example.kyrgyz_keyboard_android.keyboard.predictive_text.DummyPredictiveEngine
 import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

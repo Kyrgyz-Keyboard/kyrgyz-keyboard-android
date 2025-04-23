@@ -1,4 +1,4 @@
-package com.example.kyrgyz_keyboard_android.keyboard
+package com.example.kyrgyz_keyboard_android.keyboard.predictive_text
 
 class DummyPredictiveEngine : PredictiveTextEngine {
     private val wordDatabase = mapOf(

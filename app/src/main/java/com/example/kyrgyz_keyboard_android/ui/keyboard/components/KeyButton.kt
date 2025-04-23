@@ -21,8 +21,8 @@ import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import com.example.kyrgyz_keyboard_android.keyboard.model.KeyUiModel
 import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
 import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants
-import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyCornerRadius
-import com.example.kyrgyz_keyboard_android.ui.theme.EnterBlue
+import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions
+import com.example.kyrgyz_keyboard_android.ui.theme.EnterColor
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyBackgroundColor
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyGray
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyLockedBackgroundColor
@@ -66,7 +66,7 @@ fun KeyButton(
     Box(
         modifier = modifier
             .background(
-                color = getBackgroundColor(key), shape = RoundedCornerShape(keyCornerRadius)
+                color = getBackgroundColor(key), shape = RoundedCornerShape(Dimensions.keyCornerRadius)
             )
             .pointerInput(key, capsLockEnabled) {
                 detectTapGestures(onPress = {
@@ -102,6 +102,6 @@ fun KeyButton(
 private fun getBackgroundColor(key: KeyUiModel): Color = when {
     key.isActive == CapsLockState.LOCKED -> KeyLockedBackgroundColor
     key.isSpecial && key.img != R.drawable.ic_enter -> KeyGray
-    key.isSpecial && key.img == R.drawable.ic_enter -> EnterBlue
+    key.isSpecial && key.img == R.drawable.ic_enter -> EnterColor
     else -> KeyBackgroundColor
 }

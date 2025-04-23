@@ -13,8 +13,12 @@ val Pink40 = Color(0xFF7D5260)
 // Keyboard Colors
 val KeyboardGray = Color(0xFFE8EAED)
 val KeyGray = Color(0xFFCFD3D9)
-val EnterBlue = Color(0xFC1A73E8)
+val EnterColor = Color(0xffeb392a)
 val EnterImgColor = Color.White
 val KeyTextColor = Color.Black
 val KeyBackgroundColor = Color.White
 val KeyLockedBackgroundColor = Color.LightGray
+
+val FlagRed = Color(0xffeb392a)
+val FlagYellow = Color(0xffffff59)
+val GBoardBlue = Color(0xFC1A73E8)

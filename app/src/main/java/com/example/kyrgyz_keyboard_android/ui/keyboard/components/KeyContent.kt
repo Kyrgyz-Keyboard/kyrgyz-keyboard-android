@@ -12,7 +12,7 @@ import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import com.example.kyrgyz_keyboard_android.keyboard.model.KeyUiModel
 import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
 import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants
-import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyIconSize
+import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions
 import com.example.kyrgyz_keyboard_android.ui.theme.EnterImgColor
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyTextColor
 import com.example.kyrgyz_keyboard_android.ui.theme.keyboardTextStyle
@@ -27,7 +27,7 @@ fun KeyContent(
             Image(
                 painter = painterResource(id = key.img),
                 contentDescription = null,
-                modifier = Modifier.size(keyIconSize),
+                modifier = Modifier.size(Dimensions.keyIconSize),
                 colorFilter = (if (key.img == R.drawable.ic_enter) {
                     ColorFilter.tint(EnterImgColor)
                 } else if (key.img == R.drawable.ic_emoji) {
