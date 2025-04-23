@@ -73,6 +73,6 @@ object KeyboardLayout {
         KeyUiModel(ch = ","),
         KeyUiModel(ch = "аралык", weight = 5f),
         KeyUiModel(ch = "."),
-        KeyUiModel(ch = "<-", weight = 2f)
+        KeyUiModel(isSpecial = true, img = R.drawable.ic_enter, weight = 2f)
     )
 }

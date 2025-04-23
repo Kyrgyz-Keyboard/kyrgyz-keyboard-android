@@ -26,6 +26,7 @@ import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.M
 import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.SPEED_DECREASE_FACTOR_INITIAL
 import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.SPEED_DECREASE_FACTOR_NORMAL
 import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyCornerRadius
+import com.example.kyrgyz_keyboard_android.ui.theme.EnterBlue
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyBackgroundColor
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyGray
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyLockedBackgroundColor
@@ -100,6 +101,7 @@ fun KeyButton(
 
 private fun getBackgroundColor(key: KeyUiModel): Color = when {
     key.isActive == CapsLockState.LOCKED -> KeyLockedBackgroundColor
-    key.isSpecial -> KeyGray
+    key.isSpecial && key.img != R.drawable.ic_enter -> KeyGray
+    key.isSpecial && key.img == R.drawable.ic_enter -> EnterBlue
     else -> KeyBackgroundColor
 }

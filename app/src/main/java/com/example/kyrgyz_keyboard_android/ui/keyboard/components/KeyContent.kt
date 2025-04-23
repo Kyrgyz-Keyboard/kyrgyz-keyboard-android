@@ -7,11 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import com.example.kyrgyz_keyboard_android.R
 import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import com.example.kyrgyz_keyboard_android.keyboard.model.KeyUiModel
 import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
 import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants
 import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyIconSize
+import com.example.kyrgyz_keyboard_android.ui.theme.EnterImgColor
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyTextColor
 import com.example.kyrgyz_keyboard_android.ui.theme.keyboardTextStyle
 
@@ -25,7 +27,11 @@ fun KeyContent(
                 painter = painterResource(id = key.img),
                 contentDescription = null,
                 modifier = Modifier.size(keyIconSize),
-                colorFilter = ColorFilter.tint(KeyTextColor)
+                colorFilter = if (key.img == R.drawable.ic_enter) {
+                    ColorFilter.tint(EnterImgColor)
+                } else {
+                    ColorFilter.tint(KeyTextColor)
+                }
             )
         }
 

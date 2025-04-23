@@ -21,6 +21,9 @@ fun handleKeyClick(
             inputConnection?.deleteSurroundingText(1, 0)
             viewModel.onBackspace()
         }
+        key.img == R.drawable.ic_enter -> {
+            inputConnection?.commitText("\n", 1)
+        }
         key.ch == KeyboardConstants.SPACE_CHARACTER -> {
             inputConnection?.commitText(" ", 1)
             viewModel.onTextInput(" ")
