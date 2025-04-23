@@ -17,6 +17,11 @@ import com.example.kyrgyz_keyboard_android.keyboard.model.KeyboardLayout.row2
 import com.example.kyrgyz_keyboard_android.keyboard.model.KeyboardLayout.row3
 import com.example.kyrgyz_keyboard_android.keyboard.model.KeyboardLayout.row4
 import com.example.kyrgyz_keyboard_android.keyboard.model.KeyboardLayout.row5
+import com.example.kyrgyz_keyboard_android.keyboard.model.SymbolsLayout.symbolsRow1
+import com.example.kyrgyz_keyboard_android.keyboard.model.SymbolsLayout.symbolsRow2
+import com.example.kyrgyz_keyboard_android.keyboard.model.SymbolsLayout.symbolsRow3
+import com.example.kyrgyz_keyboard_android.keyboard.model.SymbolsLayout.symbolsRow4
+import com.example.kyrgyz_keyboard_android.keyboard.model.SymbolsLayout.symbolsRow5
 import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
 import com.example.kyrgyz_keyboard_android.ui.keyboard.components.CapsLockRow
 import com.example.kyrgyz_keyboard_android.ui.keyboard.components.KeyboardRow
@@ -31,6 +36,7 @@ fun HomeScreen(viewModel: KeyboardViewModel = viewModel()) {
     val suggestions by viewModel.suggestions.collectAsState()
     val currentWord by viewModel.currentWord.collectAsState()
     val isMidWord by viewModel.isMidWord.collectAsState()
+    val isSymbolsMode by viewModel.isSymbolsMode.collectAsState()
 
     Column(
         modifier = Modifier
@@ -44,10 +50,33 @@ fun HomeScreen(viewModel: KeyboardViewModel = viewModel()) {
             isMidWord = isMidWord
         )
 
-        KeyboardLayout(
-            capsLockEnabled = capsLockEnabled,
-            viewModel = viewModel
-        )
+        if (isSymbolsMode) {
+            SymbolsLayout(viewModel)
+        } else {
+            KeyboardLayout(
+                capsLockEnabled = capsLockEnabled,
+                viewModel = viewModel
+            )
+        }
+    }
+}
+
+@Composable
+fun SymbolsLayout(
+    viewModel: KeyboardViewModel
+) {
+    Column(
+        modifier = Modifier
+            .background(color = KeyboardGray)
+            .fillMaxWidth()
+            .padding(bottom = keyboardBottomPadding)
+            .padding(horizontal = keyboardHorizontalPadding, vertical = keyboardVerticalPadding)
+    ) {
+        KeyboardRow(keys = symbolsRow1, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = symbolsRow2, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = symbolsRow3, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = symbolsRow4, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = symbolsRow5, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
     }
 }
 

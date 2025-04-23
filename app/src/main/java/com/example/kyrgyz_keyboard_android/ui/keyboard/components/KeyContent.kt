@@ -16,6 +16,7 @@ import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyIconSize
 import com.example.kyrgyz_keyboard_android.ui.theme.EnterImgColor
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyTextColor
 import com.example.kyrgyz_keyboard_android.ui.theme.keyboardTextStyle
+import com.example.kyrgyz_keyboard_android.ui.theme.symbolsBtnTextStyle
 
 @Composable
 fun KeyContent(
@@ -27,11 +28,13 @@ fun KeyContent(
                 painter = painterResource(id = key.img),
                 contentDescription = null,
                 modifier = Modifier.size(keyIconSize),
-                colorFilter = if (key.img == R.drawable.ic_enter) {
+                colorFilter = (if (key.img == R.drawable.ic_enter) {
                     ColorFilter.tint(EnterImgColor)
+                } else if (key.img == R.drawable.ic_emoji) {
+                    null
                 } else {
                     ColorFilter.tint(KeyTextColor)
-                }
+                })
             )
         }
 
@@ -42,9 +45,15 @@ fun KeyContent(
                 else -> key.ch?.lowercase()
             } ?: ""
 
-            Text(
-                text = text, style = keyboardTextStyle, color = KeyTextColor
-            )
+            if (key.ch == KeyboardConstants.SYMBOLS_CHARACTER) {
+                Text(
+                    text = text, style = symbolsBtnTextStyle, color = KeyTextColor
+                )
+            } else {
+                Text(
+                    text = text, style = keyboardTextStyle, color = KeyTextColor
+                )
+            }
         }
     }
 }

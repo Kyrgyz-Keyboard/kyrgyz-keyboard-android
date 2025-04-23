@@ -27,8 +27,17 @@ class KeyboardViewModel : ViewModel() {
     private val _isMidWord = MutableStateFlow(false)
     val isMidWord: StateFlow<Boolean> = _isMidWord.asStateFlow()
 
+    private val _isSymbolsMode = MutableStateFlow(false)
+    val isSymbolsMode: StateFlow<Boolean> = _isSymbolsMode.asStateFlow()
+
     init {
         updateSuggestions()
+    }
+
+    fun toggleSymbolsMode() {
+        viewModelScope.launch {
+            _isSymbolsMode.value = !_isSymbolsMode.value
+        }
     }
 
     fun updateCapsLockState(newState: CapsLockState) {
@@ -55,6 +64,8 @@ class KeyboardViewModel : ViewModel() {
             if (text == " ") {
                 onWordComplete()
                 _inputBuffer.value += " "
+            } else if (text == "\n") {
+                onWordComplete()
             } else {
                 _currentWord.value += text
                 _inputBuffer.value += text

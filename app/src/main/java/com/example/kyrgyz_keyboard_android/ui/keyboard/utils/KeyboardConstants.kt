@@ -10,4 +10,5 @@ object KeyboardConstants {
 
     // Special Characters
     const val SPACE_CHARACTER = "аралык"
+    const val SYMBOLS_CHARACTER = "123"
 }

@@ -23,6 +23,10 @@ fun handleKeyClick(
         }
         key.img == R.drawable.ic_enter -> {
             inputConnection?.commitText("\n", 1)
+            viewModel.onTextInput("\n")
+        }
+        key.ch == KeyboardConstants.SYMBOLS_CHARACTER -> {
+
         }
         key.ch == KeyboardConstants.SPACE_CHARACTER -> {
             inputConnection?.commitText(" ", 1)

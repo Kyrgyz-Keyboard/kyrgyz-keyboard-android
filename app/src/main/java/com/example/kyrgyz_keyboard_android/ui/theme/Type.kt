@@ -7,6 +7,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyTextSize
+import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.symbolsBtnTextSize
 
 // Set of Material typography styles to start with
 val Typography = Typography(
@@ -37,4 +38,7 @@ val Typography = Typography(
 
 val keyboardTextStyle = TextStyle(
     fontSize = keyTextSize, color = KeyTextColor, textAlign = TextAlign.Center
+)
+val symbolsBtnTextStyle = TextStyle(
+    fontSize = symbolsBtnTextSize, color = KeyTextColor, textAlign = TextAlign.Center
 )

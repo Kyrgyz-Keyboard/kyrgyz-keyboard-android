@@ -20,11 +20,7 @@ import com.example.kyrgyz_keyboard_android.keyboard.input.handleKeyClick
 import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import com.example.kyrgyz_keyboard_android.keyboard.model.KeyUiModel
 import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
-import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.INITIAL_DELETE_SPEED
-import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.INITIAL_SPEED_PHASE_ITERATIONS
-import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.MIN_DELETE_SPEED
-import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.SPEED_DECREASE_FACTOR_INITIAL
-import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.SPEED_DECREASE_FACTOR_NORMAL
+import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants
 import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyCornerRadius
 import com.example.kyrgyz_keyboard_android.ui.theme.EnterBlue
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyBackgroundColor
@@ -45,7 +41,7 @@ fun KeyButton(
     LaunchedEffect(isBackspacePressed) {
         if (isBackspacePressed && key.img == R.drawable.ic_remove) {
             var iterations = 0
-            var currentSpeed = INITIAL_DELETE_SPEED
+            var currentSpeed = KeyboardConstants.INITIAL_DELETE_SPEED
 
             handleKeyClick(key, capsLockEnabled, context, viewModel)
             viewModel.onBackspace()
@@ -56,12 +52,12 @@ fun KeyButton(
                 viewModel.onBackspace()
                 iterations++
 
-                currentSpeed = if (iterations < INITIAL_SPEED_PHASE_ITERATIONS) {
-                    (currentSpeed * SPEED_DECREASE_FACTOR_INITIAL).toLong()
-                        .coerceAtLeast(MIN_DELETE_SPEED)
+                currentSpeed = if (iterations < KeyboardConstants.INITIAL_SPEED_PHASE_ITERATIONS) {
+                    (currentSpeed * KeyboardConstants.SPEED_DECREASE_FACTOR_INITIAL).toLong()
+                        .coerceAtLeast(KeyboardConstants.MIN_DELETE_SPEED)
                 } else {
-                    (currentSpeed * SPEED_DECREASE_FACTOR_NORMAL).toLong()
-                        .coerceAtLeast(MIN_DELETE_SPEED)
+                    (currentSpeed * KeyboardConstants.SPEED_DECREASE_FACTOR_NORMAL).toLong()
+                        .coerceAtLeast(KeyboardConstants.MIN_DELETE_SPEED)
                 }
             }
         }
@@ -78,7 +74,9 @@ fun KeyButton(
                         isBackspacePressed = true
                         tryAwaitRelease()
                         isBackspacePressed = false
-                    } else {
+                    } else if (key.ch == KeyboardConstants.SYMBOLS_CHARACTER) {
+                        viewModel.toggleSymbolsMode()
+                    } else  {
                         handleKeyClick(key, capsLockEnabled, context, viewModel)
                     }
                 }, onTap = {
@@ -89,8 +87,10 @@ fun KeyButton(
                         }
                     }
                 }, onDoubleTap = {
-                    if (key.img == R.drawable.ic_caps) {
+                    if (key.img == R.drawable.ic_caps && capsLockEnabled != CapsLockState.LOCKED) {
                         viewModel.updateCapsLockState(CapsLockState.LOCKED)
+                    } else {
+                        viewModel.updateCapsLockState(CapsLockState.OFF)
                     }
                 })
             }, contentAlignment = Alignment.Center
