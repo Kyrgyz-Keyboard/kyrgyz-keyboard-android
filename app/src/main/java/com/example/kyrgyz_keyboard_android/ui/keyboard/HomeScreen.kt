@@ -30,22 +30,23 @@ fun HomeScreen(viewModel: KeyboardViewModel = viewModel()) {
     val capsLockEnabled by viewModel.capsLockState.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
     val currentWord by viewModel.currentWord.collectAsState()
-    val recentWords by viewModel.recentWords.collectAsState()
+    val isMidWord by viewModel.isMidWord.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(KeyboardGray)
     ) {
-        if (suggestions.isNotEmpty() || recentWords.isNotEmpty()) {
-            SuggestionsRow(
-                suggestions = if (currentWord.isEmpty()) recentWords else suggestions,
-                viewModel = viewModel
-            )
-        }
+        SuggestionsRow(
+            suggestions = suggestions,
+            viewModel = viewModel,
+            modifier = Modifier.padding(bottom = keyboardVerticalPadding),
+            isMidWord = isMidWord
+        )
 
         KeyboardLayout(
-            capsLockEnabled = capsLockEnabled, viewModel = viewModel
+            capsLockEnabled = capsLockEnabled,
+            viewModel = viewModel
         )
     }
 }

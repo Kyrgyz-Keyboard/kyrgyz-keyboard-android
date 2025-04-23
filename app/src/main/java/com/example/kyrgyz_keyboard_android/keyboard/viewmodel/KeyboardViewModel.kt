@@ -2,6 +2,7 @@ package com.example.kyrgyz_keyboard_android.keyboard.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kyrgyz_keyboard_android.keyboard.DummyPredictiveEngine
 import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,6 +10,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class KeyboardViewModel : ViewModel() {
+    private val predictiveEngine = DummyPredictiveEngine()
+
     private val _capsLockState = MutableStateFlow(CapsLockState.OFF)
     val capsLockState: StateFlow<CapsLockState> = _capsLockState.asStateFlow()
 
@@ -18,8 +21,15 @@ class KeyboardViewModel : ViewModel() {
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
     val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
 
-    private val _recentWords = MutableStateFlow<List<String>>(emptyList())
-    val recentWords: StateFlow<List<String>> = _recentWords.asStateFlow()
+    private val _inputBuffer = MutableStateFlow("")
+    val inputBuffer: StateFlow<String> = _inputBuffer.asStateFlow()
+
+    private val _isMidWord = MutableStateFlow(false)
+    val isMidWord: StateFlow<Boolean> = _isMidWord.asStateFlow()
+
+    init {
+        updateSuggestions()
+    }
 
     fun updateCapsLockState(newState: CapsLockState) {
         viewModelScope.launch {
@@ -27,16 +37,16 @@ class KeyboardViewModel : ViewModel() {
         }
     }
 
-    fun onSuggestionSelected(suggestion: String) {
-        viewModelScope.launch {
-            val currentLength = _currentWord.value.length
-            repeat(currentLength) {
-                onBackspace()
-            }
-
-            _currentWord.value = suggestion
-            onWordComplete(suggestion)
-            onTextInput(" ")
+    private fun updateSuggestions() {
+        if (_isMidWord.value) {
+            // Get predictions for current word being typed
+            val currentWord = _currentWord.value.lowercase()
+            val predictions = predictiveEngine.getPredictions(currentWord)
+            _suggestions.value = predictions.map { it.word }
+        } else {
+            // Get next word predictions after space
+            val predictions = predictiveEngine.getNextWordPredictions(_inputBuffer.value)
+            _suggestions.value = predictions.map { it.word }
         }
     }
 
@@ -44,65 +54,56 @@ class KeyboardViewModel : ViewModel() {
         viewModelScope.launch {
             if (text == " ") {
                 onWordComplete()
+                _inputBuffer.value += " "
             } else {
                 _currentWord.value += text
+                _inputBuffer.value += text
+                _isMidWord.value = true
                 updateSuggestions()
             }
         }
     }
 
     fun onBackspace() {
+        //prob needs to be changed later
         viewModelScope.launch {
             if (_currentWord.value.isNotEmpty()) {
-                _currentWord.value = _currentWord.value.dropLast(1)
-                updateSuggestions()
+                val newWord = _currentWord.value.dropLast(1)
+                _currentWord.value = newWord
+                _inputBuffer.value = _inputBuffer.value.dropLast(1)
+
+                _isMidWord.value = newWord.isNotEmpty()
+                if (_isMidWord.value) {
+                    val predictions = predictiveEngine.getPredictions(newWord)
+                    _suggestions.value = predictions.map { it.word }
+                } else {
+                    _suggestions.value = emptyList()
+                }
             }
         }
     }
 
-    fun onWordComplete(word: String = _currentWord.value) {
+    fun onSuggestionSelected(suggestion: String) {
         viewModelScope.launch {
-            if (word.isNotEmpty()) {
-                updateRecentWords(word)
-                _currentWord.value = ""
-                _suggestions.value = emptyList()
-            }
+            val oldWordLength = _currentWord.value.length
+            _inputBuffer.value = _inputBuffer.value.dropLast(oldWordLength)
+            _currentWord.value = ""
+            _inputBuffer.value += suggestion
+            _currentWord.value = ""
+            _isMidWord.value = false
+            updateSuggestions()
         }
     }
 
-    private suspend fun updateSuggestions() {
-        val currentWord = _currentWord.value.lowercase()
-        _suggestions.value = if (currentWord.isNotEmpty()) {
-            _recentWords.value
-                .filter { it.lowercase().startsWith(currentWord) } // Changed from contains to startsWith
-                .take(MAX_SUGGESTIONS)
-        } else {
-            emptyList()
-        }
-    }
-
-    private fun updateRecentWords(newWord: String) {
-        val currentRecent = _recentWords.value.toMutableList()
-        currentRecent.remove(newWord) // Remove if exists
-        currentRecent.add(0, newWord) // Add to beginning
-        _recentWords.value = currentRecent.take(MAX_RECENT_WORDS)
-    }
-
-    // For future implementation
-    fun loadDictionary() {
-        viewModelScope.launch {
-            // TODO: Load dictionary data
-        }
-    }
-
-    fun trainPredictiveModel(text: String) {
-        viewModelScope.launch {
-            // TODO: Update prediction model with new text
+    private fun onWordComplete(word: String = _currentWord.value) {
+        if (word.isNotEmpty()) {
+            _currentWord.value = ""
+            _isMidWord.value = false
+            updateSuggestions()
         }
     }
 
     companion object {
         private const val MAX_SUGGESTIONS = 3
-        private const val MAX_RECENT_WORDS = 4
     }
 }

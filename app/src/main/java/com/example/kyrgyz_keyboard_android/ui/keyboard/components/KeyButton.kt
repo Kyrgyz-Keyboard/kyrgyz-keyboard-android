@@ -20,7 +20,6 @@ import com.example.kyrgyz_keyboard_android.keyboard.input.handleKeyClick
 import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import com.example.kyrgyz_keyboard_android.keyboard.model.KeyUiModel
 import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
-import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants
 import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.INITIAL_DELETE_SPEED
 import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.INITIAL_SPEED_PHASE_ITERATIONS
 import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants.MIN_DELETE_SPEED
@@ -70,42 +69,30 @@ fun KeyButton(
     Box(
         modifier = modifier
             .background(
-                color = getBackgroundColor(key),
-                shape = RoundedCornerShape(keyCornerRadius)
+                color = getBackgroundColor(key), shape = RoundedCornerShape(keyCornerRadius)
             )
             .pointerInput(key, capsLockEnabled) {
-                detectTapGestures(
-                    onPress = {
-                        if (key.img == R.drawable.ic_remove) {
-                            isBackspacePressed = true
-                            tryAwaitRelease()
-                            isBackspacePressed = false
-                        } else {
-                            handleKeyClick(key, capsLockEnabled, context, viewModel)
-                            if (!key.isSpecial && key.ch != null) {
-                                viewModel.onTextInput(key.ch)
-                            }
-                            if (key.ch == KeyboardConstants.SPACE_CHARACTER) {
-                                viewModel.onWordComplete()
-                            }
-                        }
-                    },
-                    onTap = {
-                        if (key.img == R.drawable.ic_caps) {
-                            when (capsLockEnabled) {
-                                CapsLockState.OFF -> viewModel.updateCapsLockState(CapsLockState.TEMPORARY)
-                                else -> viewModel.updateCapsLockState(CapsLockState.OFF)
-                            }
-                        }
-                    },
-                    onDoubleTap = {
-                        if (key.img == R.drawable.ic_caps) {
-                            viewModel.updateCapsLockState(CapsLockState.LOCKED)
+                detectTapGestures(onPress = {
+                    if (key.img == R.drawable.ic_remove) {
+                        isBackspacePressed = true
+                        tryAwaitRelease()
+                        isBackspacePressed = false
+                    } else {
+                        handleKeyClick(key, capsLockEnabled, context, viewModel)
+                    }
+                }, onTap = {
+                    if (key.img == R.drawable.ic_caps) {
+                        when (capsLockEnabled) {
+                            CapsLockState.OFF -> viewModel.updateCapsLockState(CapsLockState.TEMPORARY)
+                            else -> viewModel.updateCapsLockState(CapsLockState.OFF)
                         }
                     }
-                )
-            },
-        contentAlignment = Alignment.Center
+                }, onDoubleTap = {
+                    if (key.img == R.drawable.ic_caps) {
+                        viewModel.updateCapsLockState(CapsLockState.LOCKED)
+                    }
+                })
+            }, contentAlignment = Alignment.Center
     ) {
         KeyContent(key = key, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
     }
