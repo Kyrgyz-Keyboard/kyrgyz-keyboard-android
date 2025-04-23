@@ -52,7 +52,7 @@ object KeyboardLayout {
     )
 
     val row4 = listOf(
-        KeyUiModel(isSpecial = true, img = R.drawable.ic_caps, weight = 1.5f),
+        KeyUiModel(isSpecial = true, img = R.drawable.ic_caps, weight = 1.4f),
         KeyUiModel(ch = "я"),
         KeyUiModel(ch = "ч"),
         KeyUiModel(ch = "с"),
@@ -62,11 +62,11 @@ object KeyboardLayout {
         KeyUiModel(ch = "ь"),
         KeyUiModel(ch = "б"),
         KeyUiModel(ch = "ю"),
-        KeyUiModel(isSpecial = true, img = R.drawable.ic_remove, weight = 1.5f)
+        KeyUiModel(isSpecial = true, img = R.drawable.ic_remove, weight = 1.4f)
     )
 
     val row5 = listOf(
-        KeyUiModel(isSpecial = true, ch = KeyboardConstants.SYMBOLS_CHARACTER, weight = 1.5f),
+        KeyUiModel(isSpecial = true, ch = KeyboardConstants.SYMBOLS_CHARACTER, weight = 1.4f),
         KeyUiModel(ch = ","),
         KeyUiModel(ch = KeyboardConstants.SPACE_CHARACTER, weight = 5f),
         KeyUiModel(ch = "."),

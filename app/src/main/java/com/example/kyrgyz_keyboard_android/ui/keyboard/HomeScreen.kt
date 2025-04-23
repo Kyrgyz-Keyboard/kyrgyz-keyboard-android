@@ -59,7 +59,6 @@ fun SymbolsLayout(
         modifier = Modifier
             .background(color = KeyboardGray)
             .fillMaxWidth()
-            .padding(bottom = Dimensions.keyboardBottomPadding)
             .padding(horizontal = Dimensions.keyboardHorizontalPadding, vertical = Dimensions.keyboardVerticalPadding)
     ) {
         KeyboardRow(keys = SymbolsLayout.symbolsRow1, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
@@ -78,7 +77,6 @@ fun KeyboardLayout(
         modifier = Modifier
             .background(color = KeyboardGray)
             .fillMaxWidth()
-            .padding(bottom = Dimensions.keyboardBottomPadding)
             .padding(horizontal = Dimensions.keyboardHorizontalPadding, vertical = Dimensions.keyboardVerticalPadding)
     ) {
         KeyboardRow(keys = KeyboardLayout.row1, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
