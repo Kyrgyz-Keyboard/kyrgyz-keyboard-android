@@ -9,7 +9,14 @@ object KeyboardConstants {
     const val INITIAL_SPEED_PHASE_ITERATIONS = 5
 
     // Special Characters
-    const val SPACE_CHARACTER = "аралык"
+    const val CYRILLIC_SPACE = "аралык"
+    const val LATIN_SPACE = "aralyk"
+    const val ENESAY_SPACE = "\uD803\uDC00\uD803\uDC3B\uD803\uDC00\uD803\uDC1E\uD803\uDC03\uD803\uDC34"
     const val SYMBOLS_CHARACTER = "123"
     const val ALPHA_CHARACTER = "абв"
+    const val ENESAY_CHARACTER = "\uD803\uDC36\uD803\uDC3B\uD803\uDC0D\uD803\uDC03\uD803\uDC15"
+
+    fun getSpaceCharacter(isLatinLayout: Boolean): String {
+        return if (isLatinLayout) LATIN_SPACE else CYRILLIC_SPACE
+    }
 }

@@ -16,22 +16,9 @@ object SymbolsLayout1 {
         KeyUiModel(ch = "_"), KeyUiModel(ch = "&"), KeyUiModel(ch = "-"),
         KeyUiModel(ch = "+"), KeyUiModel(ch = "("), KeyUiModel(ch = ")"),
         KeyUiModel(ch = "/")
-//        KeyUiModel(ch = "@"), KeyUiModel(ch = "#"),
-//        KeyUiModel(ch = "\u2286"),
-////        KeyUiModel(ch = "\u20C0"),
-//        KeyUiModel(ch = "$"), KeyUiModel(ch = "%"), KeyUiModel(ch = "&"),
-//        KeyUiModel(ch = "-"), KeyUiModel(ch = "+"), KeyUiModel(ch = "("),
-//        KeyUiModel(ch = ")")
     )
 
-//    val symbolsRow3 = listOf(
-//        KeyUiModel(ch = "!"), KeyUiModel(ch = "×"), KeyUiModel(ch = "#"),
-//        KeyUiModel(ch = "\u2286"), KeyUiModel(ch = "%"), KeyUiModel(ch = "^"),
-//        KeyUiModel(ch = "&"), KeyUiModel(ch = "*"), KeyUiModel(ch = "("),
-//        KeyUiModel(ch = ")")
-//    )
-
-    val symbolsRow4 = listOf(
+    val symbolsRow3 = listOf(
         KeyUiModel(isSpecial = true, ch = "=\\<", weight = 1.4f),
         KeyUiModel(ch = "*"), KeyUiModel(ch = "\""), KeyUiModel(ch = "'"),
         KeyUiModel(ch = ":"), KeyUiModel(ch = ";"),
@@ -39,10 +26,10 @@ object SymbolsLayout1 {
         KeyUiModel(isSpecial = true, img = R.drawable.ic_remove, weight = 1.4f)
     )
 
-    val symbolsRow5 = listOf(
+    fun getSymbolsRow5(isLatinLayout: Boolean) = listOf(
         KeyUiModel(isSpecial = true, ch = KeyboardConstants.ALPHA_CHARACTER, weight = 1.4f),
         KeyUiModel(ch = ","),
-        KeyUiModel(ch = KeyboardConstants.SPACE_CHARACTER, weight = 5f),
+        KeyUiModel(ch = KeyboardConstants.getSpaceCharacter(isLatinLayout), weight = 5f),
         KeyUiModel(ch = "."),
         KeyUiModel(isSpecial = true, img = R.drawable.ic_enter, weight = 2f)
     )
@@ -61,34 +48,21 @@ object SymbolsLayout2 {
         KeyUiModel(ch = "^"), KeyUiModel(ch = "<"), KeyUiModel(ch = "="),
         KeyUiModel(ch = ">"), KeyUiModel(ch = "{"), KeyUiModel(ch = "}"),
         KeyUiModel(ch = "\\")
-//        KeyUiModel(ch = "@"), KeyUiModel(ch = "#"),
-//        KeyUiModel(ch = "\u2286"),
-////        KeyUiModel(ch = "\u20C0"),
-//        KeyUiModel(ch = "$"), KeyUiModel(ch = "%"), KeyUiModel(ch = "&"),
-//        KeyUiModel(ch = "-"), KeyUiModel(ch = "+"), KeyUiModel(ch = "("),
-//        KeyUiModel(ch = ")")
     )
 
-//    val symbolsRow3 = listOf(
-//        KeyUiModel(ch = "!"), KeyUiModel(ch = "@"), KeyUiModel(ch = "#"),
-//        KeyUiModel(ch = "\u2286"), KeyUiModel(ch = "%"), KeyUiModel(ch = "^"),
-//        KeyUiModel(ch = "&"), KeyUiModel(ch = "*"), KeyUiModel(ch = "("),
-//        KeyUiModel(ch = ")")
-//    )
 
-    val symbolsRow4 = listOf(
+    val symbolsRow3 = listOf(
         KeyUiModel(isSpecial = true, ch = "?123", weight = 1.4f),
         KeyUiModel(ch = "%"), KeyUiModel(ch = "["), KeyUiModel(ch = "]"),
         KeyUiModel(ch = "№"), KeyUiModel(ch = "±"), KeyUiModel(ch = "©"),
         KeyUiModel(ch = "®"),
-//        KeyUiModel(ch = "]"), KeyUiModel(ch = "\\"), KeyUiModel(ch = "|"),
         KeyUiModel(isSpecial = true, img = R.drawable.ic_remove, weight = 1.4f)
     )
 
-    val symbolsRow5 = listOf(
+    fun getSymbolsRow5(isLatinLayout: Boolean) = listOf(
         KeyUiModel(isSpecial = true, ch = KeyboardConstants.ALPHA_CHARACTER, weight = 1.4f),
         KeyUiModel(ch = ","),
-        KeyUiModel(ch = KeyboardConstants.SPACE_CHARACTER, weight = 5f),
+        KeyUiModel(ch = KeyboardConstants.getSpaceCharacter(isLatinLayout), weight = 5f),
         KeyUiModel(ch = "."),
         KeyUiModel(isSpecial = true, img = R.drawable.ic_enter, weight = 2f)
     )

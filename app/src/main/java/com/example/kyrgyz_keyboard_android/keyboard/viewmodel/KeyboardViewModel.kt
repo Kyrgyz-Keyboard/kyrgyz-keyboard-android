@@ -31,6 +31,27 @@ class KeyboardViewModel : ViewModel() {
         _keyboardState.update { it.copy(isSymbolsLayout2 = !it.isSymbolsLayout2) }
     }
 
+    fun toggleLatinLayout() {
+        _keyboardState.update { it.copy(
+            isLatinLayout = true,
+            isEnesayLayout = false
+        ) }
+    }
+
+    fun toggleCyrillicLayout() {
+        _keyboardState.update { it.copy(
+            isLatinLayout = false,
+            isEnesayLayout = false
+        ) }
+    }
+
+    fun toggleEnesayLayout() {
+        _keyboardState.update { it.copy(
+            isEnesayLayout = !it.isEnesayLayout,
+            isLatinLayout = false
+        ) }
+    }
+
     fun updateCapsLockState(newState: CapsLockState) = viewModelScope.launch {
         _keyboardState.update { it.copy(capsLockState = newState) }
     }
@@ -116,5 +137,7 @@ data class KeyboardState(
     val inputBuffer: String = "",
     val isMidWord: Boolean = false,
     val isSymbolsMode: Boolean = false,
-    val isSymbolsLayout2: Boolean = false
+    val isSymbolsLayout2: Boolean = false,
+    val isLatinLayout: Boolean = false,
+    val isEnesayLayout: Boolean = false
 )

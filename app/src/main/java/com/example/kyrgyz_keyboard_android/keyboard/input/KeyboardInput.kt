@@ -25,7 +25,9 @@ fun handleKeyClick(
             inputConnection.commitText("\n", 1)
             viewModel.onTextInput("\n")
         }
-        key.ch == KeyboardConstants.SPACE_CHARACTER -> {
+        key.ch == KeyboardConstants.CYRILLIC_SPACE
+                || key.ch == KeyboardConstants.LATIN_SPACE
+                || key.ch == KeyboardConstants.ENESAY_SPACE -> {
             inputConnection.commitText(" ", 1)
             viewModel.onTextInput(" ")
         }

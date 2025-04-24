@@ -76,9 +76,17 @@ fun KeyButton(
                                 tryAwaitRelease()
                                 isBackspacePressed = false
                             }
+                            key.img == R.drawable.ic_globe -> {
+                                when {
+                                    viewModel.keyboardState.value.isEnesayLayout -> viewModel.toggleLatinLayout()
+                                    viewModel.keyboardState.value.isLatinLayout -> viewModel.toggleCyrillicLayout()
+                                    else -> viewModel.toggleLatinLayout()
+                                }
+                            }
                             key.ch == "=\\<" || key.ch == "?123" -> viewModel.toggleSymbolsLayout()
                             key.ch == KeyboardConstants.SYMBOLS_CHARACTER -> viewModel.toggleKeyboardMode()
                             key.ch == KeyboardConstants.ALPHA_CHARACTER -> viewModel.toggleKeyboardMode()
+                            key.ch == KeyboardConstants.ENESAY_CHARACTER -> viewModel.toggleEnesayLayout()
                             else -> handleKeyClick(key, capsLockEnabled, context, viewModel)
                         }
                     },
