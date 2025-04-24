@@ -13,12 +13,12 @@ data class KeyUiModel(
 
 object KeyboardLayout {
     val row1 = listOf(
-        KeyUiModel(isSpecial = true, ch = "öñü", weight = 2f),
-//        KeyUiModel(ch = "\uD803\uDC00\uD803\uDC20\uD803\uDC2F\uD803\uDC2F\uD803\uDC3E\uD803\uDC03", weight = 2f),
+        KeyUiModel(isSpecial = true, img = R.drawable.ic_globe),
+        KeyUiModel(isSpecial = true, ch = "\uD803\uDC36\uD803\uDC3B\uD803\uDC0D\uD803\uDC15", weight = 2f),
         KeyUiModel(ch = "ң"),
         KeyUiModel(ch = "ө"),
         KeyUiModel(ch = "ү"),
-        KeyUiModel(isSpecial = true, ch = "\uD803\uDC36\uD803\uDC3B\uD803\uDC0D\uD803\uDC15", weight = 1.5f),
+        KeyUiModel(isSpecial = true, ch = "сөздүк", weight = 2f),
         KeyUiModel(isSpecial = true, img = R.drawable.ic_emoji)
     )
 
@@ -32,7 +32,6 @@ object KeyboardLayout {
         KeyUiModel(ch = "н"),
         KeyUiModel(ch = "г"),
         KeyUiModel(ch = "ш"),
-        KeyUiModel(ch = "щ"),
         KeyUiModel(ch = "з"),
         KeyUiModel(ch = "х")
     )
@@ -47,8 +46,7 @@ object KeyboardLayout {
         KeyUiModel(ch = "о"),
         KeyUiModel(ch = "л"),
         KeyUiModel(ch = "д"),
-        KeyUiModel(ch = "ж"),
-        KeyUiModel(ch = "э")
+        KeyUiModel(ch = "ж")
     )
 
     val row4 = listOf(
@@ -59,9 +57,9 @@ object KeyboardLayout {
         KeyUiModel(ch = "м"),
         KeyUiModel(ch = "и"),
         KeyUiModel(ch = "т"),
-        KeyUiModel(ch = "ь"),
         KeyUiModel(ch = "б"),
         KeyUiModel(ch = "ю"),
+        KeyUiModel(ch = "э"),
         KeyUiModel(isSpecial = true, img = R.drawable.ic_remove, weight = 1.4f)
     )
 

@@ -4,6 +4,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions.keyTextSize
@@ -37,8 +38,16 @@ val Typography = Typography(
 )
 
 val keyboardTextStyle = TextStyle(
-    fontSize = keyTextSize, color = KeyTextColor, textAlign = TextAlign.Center
+    fontSize = keyTextSize,
+    color = KeyTextColor,
+    textAlign = TextAlign.Center,
+    fontFamily = FontFamily.Default,
+    fontWeight = FontWeight.Normal,
+    lineHeight = keyTextSize,
+    letterSpacing = 0.sp,
+    baselineShift = BaselineShift.None
 )
+
 val symbolsBtnTextStyle = TextStyle(
     fontSize = symbolsBtnTextSize, color = KeyTextColor, textAlign = TextAlign.Center
 )

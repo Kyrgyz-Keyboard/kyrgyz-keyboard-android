@@ -9,11 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import com.example.kyrgyz_keyboard_android.keyboard.model.KeyboardLayout
-import com.example.kyrgyz_keyboard_android.keyboard.model.SymbolsLayout
+import com.example.kyrgyz_keyboard_android.keyboard.model.SymbolsLayout1
+import com.example.kyrgyz_keyboard_android.keyboard.model.SymbolsLayout2
 import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
 import com.example.kyrgyz_keyboard_android.ui.keyboard.components.CapsLockRow
 import com.example.kyrgyz_keyboard_android.ui.keyboard.components.KeyboardRow
@@ -22,65 +22,59 @@ import com.example.kyrgyz_keyboard_android.ui.theme.KeyboardGray
 
 @Composable
 fun HomeScreen(viewModel: KeyboardViewModel = viewModel()) {
-    val capsLockEnabled by viewModel.capsLockState.collectAsState()
+    val keyboardState by viewModel.keyboardState.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
-    val currentWord by viewModel.currentWord.collectAsState()
-    val isMidWord by viewModel.isMidWord.collectAsState()
-    val isSymbolsMode by viewModel.isSymbolsMode.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(KeyboardGray)
-    ) {
+    KeyboardContainer {
         SuggestionsRow(
             suggestions = suggestions,
             viewModel = viewModel,
             modifier = Modifier.padding(bottom = Dimensions.keyboardVerticalPadding),
-            isMidWord = isMidWord
+            isMidWord = keyboardState.isMidWord
         )
 
-        if (isSymbolsMode) {
-            SymbolsLayout(viewModel)
-        } else {
-            KeyboardLayout(
-                capsLockEnabled = capsLockEnabled,
-                viewModel = viewModel
-            )
+        when {
+            keyboardState.isSymbolsMode && keyboardState.isSymbolsLayout2 -> SymbolsLayout2(viewModel)
+            keyboardState.isSymbolsMode -> SymbolsLayout(viewModel)
+            else -> KeyboardLayout(keyboardState.capsLockState, viewModel)
         }
     }
 }
 
 @Composable
-fun SymbolsLayout(
-    viewModel: KeyboardViewModel
-) {
+private fun KeyboardContainer(content: @Composable () -> Unit) {
     Column(
         modifier = Modifier
-            .background(color = KeyboardGray)
             .fillMaxWidth()
-            .padding(bottom = Dimensions.keyboardBottomPadding)
-            .padding(horizontal = Dimensions.keyboardHorizontalPadding, vertical = Dimensions.keyboardVerticalPadding)
+            .background(KeyboardGray)
     ) {
-        KeyboardRow(keys = SymbolsLayout.symbolsRow1, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
-        KeyboardRow(keys = SymbolsLayout.symbolsRow2, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
-        KeyboardRow(keys = SymbolsLayout.symbolsRow3, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
-        KeyboardRow(keys = SymbolsLayout.symbolsRow4, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
-        KeyboardRow(keys = SymbolsLayout.symbolsRow5, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        content()
     }
 }
 
 @Composable
-fun KeyboardLayout(
-    capsLockEnabled: CapsLockState, viewModel: KeyboardViewModel
-) {
-    Column(
-        modifier = Modifier
-            .background(color = KeyboardGray)
-            .fillMaxWidth()
-            .padding(bottom = Dimensions.keyboardBottomPadding)
-            .padding(horizontal = Dimensions.keyboardHorizontalPadding, vertical = Dimensions.keyboardVerticalPadding)
-    ) {
+private fun SymbolsLayout(viewModel: KeyboardViewModel) {
+    KeyboardBase {
+        KeyboardRow(keys = SymbolsLayout1.symbolsRow1, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout1.symbolsRow2, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout1.symbolsRow4, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout1.symbolsRow5, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+    }
+}
+
+@Composable
+private fun SymbolsLayout2(viewModel: KeyboardViewModel) {
+    KeyboardBase {
+        KeyboardRow(keys = SymbolsLayout2.symbolsRow1, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout2.symbolsRow2, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout2.symbolsRow4, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout2.symbolsRow5, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+    }
+}
+
+@Composable
+private fun KeyboardLayout(capsLockEnabled: CapsLockState, viewModel: KeyboardViewModel) {
+    KeyboardBase {
         KeyboardRow(keys = KeyboardLayout.row1, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
         KeyboardRow(keys = KeyboardLayout.row2, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
         KeyboardRow(keys = KeyboardLayout.row3, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
@@ -89,8 +83,16 @@ fun KeyboardLayout(
     }
 }
 
-@Preview
 @Composable
-fun HomeScreenPreview() {
-    HomeScreen()
+private fun KeyboardBase(content: @Composable () -> Unit) {
+    Column(
+        modifier = Modifier
+            .background(color = KeyboardGray)
+            .fillMaxWidth()
+            .padding(horizontal = Dimensions.keyboardHorizontalPadding,
+                vertical = Dimensions.keyboardVerticalPadding)
+            .padding(bottom = Dimensions.keyboardBottomPadding)
+    ) {
+        content()
+    }
 }

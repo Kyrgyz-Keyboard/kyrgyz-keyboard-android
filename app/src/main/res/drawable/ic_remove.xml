@@ -8,7 +8,7 @@
     <!-- Outer backspace shape -->
     <path
         android:strokeColor="@android:color/white"
-        android:strokeWidth="1"
+        android:strokeWidth="1.5"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
         android:pathData="M20,6a1,1 0 0 1 1,1v10a1,1 0 0 1 -1,1h-11l-5,-5a1.5,1.5 0 0 1 0,-2l5,-5z" />
@@ -16,7 +16,7 @@
     <!-- X inside the key -->
     <path
         android:strokeColor="@android:color/white"
-        android:strokeWidth="1"
+        android:strokeWidth="1.5"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
         android:pathData="M12,10l4,4M16,10l-4,4" />

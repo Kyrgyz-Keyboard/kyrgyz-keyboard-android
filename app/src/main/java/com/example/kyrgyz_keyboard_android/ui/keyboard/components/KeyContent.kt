@@ -45,7 +45,7 @@ fun KeyContent(
                 else -> key.ch?.lowercase()
             } ?: ""
 
-            if (key.ch == KeyboardConstants.SYMBOLS_CHARACTER) {
+            if (key.isSpecial || key.ch == KeyboardConstants.SPACE_CHARACTER) {
                 Text(
                     text = text, style = symbolsBtnTextStyle, color = KeyTextColor
                 )

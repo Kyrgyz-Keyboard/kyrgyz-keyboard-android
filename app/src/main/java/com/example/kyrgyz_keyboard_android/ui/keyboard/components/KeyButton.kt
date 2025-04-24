@@ -44,12 +44,10 @@ fun KeyButton(
             var currentSpeed = KeyboardConstants.INITIAL_DELETE_SPEED
 
             handleKeyClick(key, capsLockEnabled, context, viewModel)
-            viewModel.onBackspace()
 
             while (isBackspacePressed) {
                 delay(currentSpeed)
                 handleKeyClick(key, capsLockEnabled, context, viewModel)
-                viewModel.onBackspace()
                 iterations++
 
                 currentSpeed = if (iterations < KeyboardConstants.INITIAL_SPEED_PHASE_ITERATIONS) {
@@ -66,34 +64,43 @@ fun KeyButton(
     Box(
         modifier = modifier
             .background(
-                color = getBackgroundColor(key), shape = RoundedCornerShape(Dimensions.keyCornerRadius)
+                color = getBackgroundColor(key),
+                shape = RoundedCornerShape(Dimensions.keyCornerRadius)
             )
             .pointerInput(key, capsLockEnabled) {
-                detectTapGestures(onPress = {
-                    if (key.img == R.drawable.ic_remove) {
-                        isBackspacePressed = true
-                        tryAwaitRelease()
-                        isBackspacePressed = false
-                    } else if (key.ch == KeyboardConstants.SYMBOLS_CHARACTER) {
-                        viewModel.toggleSymbolsMode()
-                    } else  {
-                        handleKeyClick(key, capsLockEnabled, context, viewModel)
-                    }
-                }, onTap = {
-                    if (key.img == R.drawable.ic_caps) {
-                        when (capsLockEnabled) {
-                            CapsLockState.OFF -> viewModel.updateCapsLockState(CapsLockState.TEMPORARY)
-                            else -> viewModel.updateCapsLockState(CapsLockState.OFF)
+                detectTapGestures(
+                    onPress = {
+                        when {
+                            key.img == R.drawable.ic_remove -> {
+                                isBackspacePressed = true
+                                tryAwaitRelease()
+                                isBackspacePressed = false
+                            }
+                            key.ch == "=\\<" || key.ch == "?123" -> viewModel.toggleSymbolsLayout()
+                            key.ch == KeyboardConstants.SYMBOLS_CHARACTER -> viewModel.toggleKeyboardMode()
+                            key.ch == KeyboardConstants.ALPHA_CHARACTER -> viewModel.toggleKeyboardMode()
+                            else -> handleKeyClick(key, capsLockEnabled, context, viewModel)
+                        }
+                    },
+                    onTap = {
+                        if (key.img == R.drawable.ic_caps) {
+                            viewModel.updateCapsLockState(
+                                if (capsLockEnabled == CapsLockState.OFF) CapsLockState.TEMPORARY
+                                else CapsLockState.OFF
+                            )
+                        }
+                    },
+                    onDoubleTap = {
+                        if (key.img == R.drawable.ic_caps) {
+                            viewModel.updateCapsLockState(
+                                if (capsLockEnabled != CapsLockState.LOCKED) CapsLockState.LOCKED
+                                else CapsLockState.OFF
+                            )
                         }
                     }
-                }, onDoubleTap = {
-                    if (key.img == R.drawable.ic_caps && capsLockEnabled != CapsLockState.LOCKED) {
-                        viewModel.updateCapsLockState(CapsLockState.LOCKED)
-                    } else if (key.img == R.drawable.ic_caps && capsLockEnabled == CapsLockState.LOCKED) {
-                        viewModel.updateCapsLockState(CapsLockState.OFF)
-                    }
-                })
-            }, contentAlignment = Alignment.Center
+                )
+            },
+        contentAlignment = Alignment.Center
     ) {
         KeyContent(key = key, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
     }

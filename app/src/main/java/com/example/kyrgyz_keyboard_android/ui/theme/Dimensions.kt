@@ -8,8 +8,8 @@ object Dimensions {
     val keyboardHorizontalPadding = 8.dp
     val keyboardVerticalPadding = 4.dp
     val keyVerticalPadding = 4.dp
-    val keySpacing = 4.dp
-    val keyHeight = 42.dp
+    val keySpacing = 5.dp
+    val keyHeight = 46.dp
     val keyCornerRadius = 5.dp
     val keyContentPadding = 5.dp
     val keyIconSize = 24.dp
