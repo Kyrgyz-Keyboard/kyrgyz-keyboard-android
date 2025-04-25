@@ -9,6 +9,9 @@ object KeyboardConstants {
     const val INITIAL_SPEED_PHASE_ITERATIONS = 5
 
     // Special Characters
+    const val CYRILLIC_DICT = "сөздүк"
+    const val LATIN_DICT = "sözdük"
+    const val ENESAY_DICT = "\uD803\uDC3D\uD803\uDC07\uD803\uDC15\uD803\uDC12\uD803\uDC08\uD803\uDC34"
     const val CYRILLIC_SPACE = "аралык"
     const val LATIN_SPACE = "aralyk"
     const val ENESAY_SPACE = "\uD803\uDC00\uD803\uDC3B\uD803\uDC00\uD803\uDC1E\uD803\uDC03\uD803\uDC34"

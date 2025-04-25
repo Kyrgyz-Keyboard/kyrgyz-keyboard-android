@@ -50,6 +50,7 @@ fun KeyContent(
                     key.ch == KeyboardConstants.CYRILLIC_SPACE
                             || key.ch == KeyboardConstants.LATIN_SPACE
                             || key.ch == KeyboardConstants.ENESAY_SPACE -> key.ch
+                    key.isSpecial && key.ch != null -> key.ch
                     capsLockEnabled == CapsLockState.TEMPORARY ||
                             capsLockEnabled == CapsLockState.LOCKED -> key.ch?.uppercase()
                     else -> key.ch?.lowercase()

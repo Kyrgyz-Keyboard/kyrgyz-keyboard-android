@@ -10,7 +10,7 @@ object LatinLayout {
         KeyUiModel(ch = "ñ"),
         KeyUiModel(ch = "ö"),
         KeyUiModel(ch = "ü"),
-        KeyUiModel(isSpecial = true, ch = "sözdük", weight = 2f),
+        KeyUiModel(isSpecial = true, ch = KeyboardConstants.LATIN_DICT, weight = 2f),
         KeyUiModel(isSpecial = true, img = R.drawable.ic_emoji)
     )
 

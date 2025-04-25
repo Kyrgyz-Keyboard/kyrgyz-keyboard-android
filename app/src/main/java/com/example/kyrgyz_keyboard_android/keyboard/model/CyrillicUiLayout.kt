@@ -10,7 +10,7 @@ object CyrillicUiLayout {
         KeyUiModel(ch = "ң"),
         KeyUiModel(ch = "ө"),
         KeyUiModel(ch = "ү"),
-        KeyUiModel(isSpecial = true, ch = "сөздүк", weight = 2f),
+        KeyUiModel(isSpecial = true, ch = KeyboardConstants.CYRILLIC_DICT, weight = 2f),
         KeyUiModel(isSpecial = true, img = R.drawable.ic_emoji)
     )
 
