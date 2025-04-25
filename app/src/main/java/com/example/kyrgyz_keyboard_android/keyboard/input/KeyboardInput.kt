@@ -18,7 +18,11 @@ fun handleKeyClick(
 
     when {
         key.img == R.drawable.ic_remove -> {
-            inputConnection.deleteSurroundingText(1, 0)
+            if (viewModel.keyboardState.value.isEnesayLayout) {
+                inputConnection.deleteSurroundingText(2, 0)
+            } else {
+                inputConnection.deleteSurroundingText(1, 0)
+            }
             viewModel.onBackspace()
         }
         key.img == R.drawable.ic_enter -> {
