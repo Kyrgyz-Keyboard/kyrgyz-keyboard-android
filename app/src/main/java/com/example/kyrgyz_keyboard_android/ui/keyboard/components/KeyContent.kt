@@ -2,7 +2,6 @@ package com.example.kyrgyz_keyboard_android.ui.keyboard.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -62,22 +61,19 @@ fun KeyContent(
                         .defaultMinSize(minWidth = 32.dp)
                         .height(45.dp)
                 ) {
-                    if (key.isSpecial || key.ch == KeyboardConstants.CYRILLIC_SPACE
-                        || key.ch == KeyboardConstants.LATIN_SPACE
-                        || key.ch == KeyboardConstants.ENESAY_SPACE
-                    ) {
-                        Text(
-                            text = text,
-                            style = symbolsBtnTextStyle,
-                            color = KeyTextColor
-                        )
-                    } else {
-                        Text(
-                            text = text,
-                            style = keyboardTextStyle,
-                            color = KeyTextColor
-                        )
-                    }
+                    Text(
+                        text = text,
+                        style = if (key.isSpecial || key.ch == KeyboardConstants.CYRILLIC_SPACE ||
+                            key.ch == KeyboardConstants.LATIN_SPACE ||
+                            key.ch == KeyboardConstants.ENESAY_SPACE
+                        ) {
+                            symbolsBtnTextStyle
+                        } else {
+                            keyboardTextStyle
+                        },
+                        color = KeyTextColor,
+                        modifier = Modifier.padding(horizontal = 2.dp)
+                    )
 
                     key.hint?.let { hint ->
                         Text(
