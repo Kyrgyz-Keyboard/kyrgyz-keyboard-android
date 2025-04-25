@@ -67,6 +67,7 @@ private fun SymbolsLayout(viewModel: KeyboardViewModel) {
         KeyboardRow(keys = SymbolsLayout1.symbolsRow1, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
         KeyboardRow(keys = SymbolsLayout1.symbolsRow2, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
         KeyboardRow(keys = SymbolsLayout1.symbolsRow3, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout1.symbolsRow4, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
         KeyboardRow(
             keys = SymbolsLayout1.getSymbolsRow5(keyboardState.isLatinLayout),
             capsLockEnabled = CapsLockState.OFF,
@@ -83,6 +84,7 @@ private fun SymbolsLayout2(viewModel: KeyboardViewModel) {
         KeyboardRow(keys = SymbolsLayout2.symbolsRow1, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
         KeyboardRow(keys = SymbolsLayout2.symbolsRow2, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
         KeyboardRow(keys = SymbolsLayout2.symbolsRow3, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout2.symbolsRow4, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
         KeyboardRow(
             keys = SymbolsLayout2.getSymbolsRow5(keyboardState.isLatinLayout),
             capsLockEnabled = CapsLockState.OFF,

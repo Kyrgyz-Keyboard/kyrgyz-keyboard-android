@@ -59,7 +59,7 @@ fun KeyContent(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .defaultMinSize(minWidth = 32.dp)  // Minimum size for small keys
+                        .defaultMinSize(minWidth = 32.dp)
                         .height(45.dp)
                 ) {
                     if (key.isSpecial || key.ch == KeyboardConstants.CYRILLIC_SPACE
