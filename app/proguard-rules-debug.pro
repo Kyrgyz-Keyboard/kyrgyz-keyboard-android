@@ -1,0 +1,9 @@
+-keep class com.example.kyrgyz_keyboard_android.** { *; }
+-dontobfuscate
+-keepattributes SourceFile,LineNumberTable
+-keep class androidx.compose.** { *; }
+-keepclassmembers class androidx.compose.** { *; }
+-keep class androidx.lifecycle.** { *; }
+-keep public class * extends android.app.Service
+-keep public class * extends android.inputmethodservice.InputMethodService
+-dontoptimize
