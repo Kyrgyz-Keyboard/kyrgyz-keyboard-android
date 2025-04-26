@@ -60,4 +60,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
+
+    dependencies {
+        implementation(files("lib/lttoolbox.jar"))
+    }
 }
