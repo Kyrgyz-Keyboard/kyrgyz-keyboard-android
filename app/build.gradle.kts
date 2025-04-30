@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.lifecycle:lifecycle-service:2.6.1")
     implementation(libs.androidx.core.ktx)
@@ -56,6 +57,7 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
 

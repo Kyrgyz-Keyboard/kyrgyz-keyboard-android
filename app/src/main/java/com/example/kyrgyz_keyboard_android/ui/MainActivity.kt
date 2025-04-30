@@ -120,6 +120,7 @@ fun KeyboardSettingsScreen() {
             keyboardActions = KeyboardActions(onDone = { hideKeyboard(context) }),
             modifier = Modifier
                 .fillMaxWidth()
+                .height(150.dp)
                 .weight(1f)
         )
 
