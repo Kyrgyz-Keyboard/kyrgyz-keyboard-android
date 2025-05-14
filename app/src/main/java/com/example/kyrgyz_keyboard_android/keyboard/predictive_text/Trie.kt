@@ -92,29 +92,37 @@ class Trie(private val words: List<String>) {
             loadNode(trie.root, input)
             return trie
         }
-        private fun loadNode(current: TrieNode, input: InputStream, layer: Int = 1): Int {
-            while (true) {
-                val b = input.read()
-                if (b == -1) return 0
-                val byte1 = b.toByte()
-                if (byte1.toInt() and RETURN_MARKER != 0) {
-                    val returnValue = (byte1.toInt() and RETURN_MARKER.inv())
-                    return if (returnValue == 0) 0 else returnValue - 1
+        private fun loadNode(root: TrieNode, input: InputStream) {
+            val stack = ArrayDeque<Pair<TrieNode, Int>>() // Stack of (node, layer)
+            stack.addLast(root to 1)
+
+            while (stack.isNotEmpty()) {
+                val (current, layer) = stack.last()
+
+                val byte1 = input.read()
+                if (byte1 == -1) break
+                val b = byte1.toByte()
+
+                if (b.toInt() and RETURN_MARKER != 0) {
+                    stack.removeLast()
+                    continue
                 }
-                val isStem = byte1.toInt() and STEM_MARKER != 0
-                val high = byte1.toInt() and (RETURN_MARKER or STEM_MARKER).inv()
+
+                val isStem = b.toInt() and STEM_MARKER.toInt() != 0
+                val high = b.toInt() and (RETURN_MARKER or STEM_MARKER).inv()
+
                 val byte2 = input.read()
                 val byte3 = input.read()
                 if (byte2 == -1 || byte3 == -1) break
+
                 val wordIndex = (high shl 16) or (byte2 shl 8) or byte3
                 val child = TrieNode()
                 current.children[Pair(isStem, wordIndex)] = child
+
                 if (layer < 4) {
-                    val ret = loadNode(child, input, layer + 1)
-                    if (ret > 0) return ret - 1
+                    stack.addLast(child to (layer + 1))
                 }
             }
-            return 0
         }
     }
 }
