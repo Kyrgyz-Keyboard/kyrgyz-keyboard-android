@@ -102,8 +102,9 @@ class Trie(private val words: List<String>) {
                 words.add(sb.toString())
             }
             val trie = Trie(words)
-            loadNode(trie.root, input)
             println("Trie loaded with ${words.size} words")
+            loadNode(trie.root, input)
+            println("Trie loaded")
             return trie
         }
 

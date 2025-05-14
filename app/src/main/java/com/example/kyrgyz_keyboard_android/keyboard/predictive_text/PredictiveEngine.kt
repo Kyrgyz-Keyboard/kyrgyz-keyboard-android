@@ -8,30 +8,26 @@ import java.nio.ByteBuffer
 
 class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
     private val binaryKirData = "kir.automorf.bin"
+    private val binaryTriData = "trie.bin"
     private val fstp = FSTProcessor()
-    // private var trie: Trie
+    private var trie: Trie
 
     init {
-        try {
-            val assetManager = context.assets
-            assetManager.open(binaryKirData).use { input ->
-                val buffer = ByteArray(input.available())
-                input.read(buffer)
-                fstp.load(ByteBuffer.wrap(buffer), binaryKirData)
-                fstp.initAnalysis()
-                if (!fstp.valid()) {
-                    throw RuntimeException("Validity test for FSTProcessor failed")
-                }
+        val assetManager = context.assets
+        assetManager.open(binaryKirData).use { input ->
+            val buffer = ByteArray(input.available())
+            input.read(buffer)
+            fstp.load(ByteBuffer.wrap(buffer), binaryKirData)
+            fstp.initAnalysis()
+            if (!fstp.valid()) {
+                throw RuntimeException("Validity test for FSTProcessor failed")
             }
+        }
 
-            // trie = try {
-            //     Trie.load(context.assets.open("trie.bin"))
-            // } catch (e: Exception) {
-            //     Trie(emptyList())
-            // }
+        trie = try {
+            Trie.load(context.assets.open(binaryTriData))
         } catch (e: Exception) {
-            Log.e("PredictiveEngine", "Failed to initialize engine", e)
-            // trie = Trie(emptyList())
+            Trie(emptyList())
         }
     }
 
