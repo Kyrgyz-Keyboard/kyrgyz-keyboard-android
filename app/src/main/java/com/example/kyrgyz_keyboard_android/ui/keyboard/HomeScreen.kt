@@ -3,7 +3,10 @@ package com.example.kyrgyz_keyboard_android.ui.keyboard
 import SuggestionsRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -136,7 +139,7 @@ private fun KeyboardBase(content: @Composable () -> Unit) {
                 horizontal = Dimensions.keyboardHorizontalPadding,
                 vertical = Dimensions.keyboardVerticalPadding
             )
-            .padding(bottom = Dimensions.keyboardBottomPadding)
+            .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
     ) {
         content()
     }
