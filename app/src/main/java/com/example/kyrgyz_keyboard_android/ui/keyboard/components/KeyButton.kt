@@ -121,6 +121,14 @@ fun KeyButton(
                                 else CapsLockState.OFF
                             )
                         }
+                    },
+                    onLongPress = {
+                        if (key.img == R.drawable.ic_caps) {
+                            viewModel.updateCapsLockState(
+                                if (capsLockEnabled != CapsLockState.LOCKED) CapsLockState.LOCKED
+                                else CapsLockState.OFF
+                            )
+                        }
                     }
                 )
             },
