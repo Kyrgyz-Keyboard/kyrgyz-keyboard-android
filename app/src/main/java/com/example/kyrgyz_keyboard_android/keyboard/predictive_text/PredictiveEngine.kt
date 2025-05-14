@@ -6,10 +6,10 @@ import org.apertium.lttoolbox.process.FSTProcessor
 import java.io.StringReader
 import java.nio.ByteBuffer
 
-class PredictiveTextEngineImpl(private val context: Context) : PredictiveTextEngine {
+class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
     private val binaryKirData = "kir.automorf.bin"
     private val fstp = FSTProcessor()
-    private lateinit var trie: Trie
+    // private var trie: Trie
 
     init {
         try {
@@ -24,14 +24,14 @@ class PredictiveTextEngineImpl(private val context: Context) : PredictiveTextEng
                 }
             }
 
-            try {
-                trie = Trie.load(context.assets.open("trie.bin"))
-            } catch (e: Exception) {
-                trie = Trie(emptyList())
-            }
+            // trie = try {
+            //     Trie.load(context.assets.open("trie.bin"))
+            // } catch (e: Exception) {
+            //     Trie(emptyList())
+            // }
         } catch (e: Exception) {
             Log.e("PredictiveEngine", "Failed to initialize engine", e)
-            trie = Trie(emptyList())
+            // trie = Trie(emptyList())
         }
     }
 
@@ -61,9 +61,16 @@ class PredictiveTextEngineImpl(private val context: Context) : PredictiveTextEng
         if (currentText.isEmpty()) {
             emptyList()
         } else {
-            val predictions = trie.getPredictions(currentText)
-            predictions.sortedByDescending { it.freq }
-                .take(MAX_SUGGESTIONS)
+            // val predictions = trie.getPredictions(currentText)
+            // predictions.sortedByDescending { it.freq }
+            //     .take(MAX_SUGGESTIONS)
+            listOf(
+                WordPrediction("тест", 0, false),
+                WordPrediction("тест2", 0, false),
+                WordPrediction("тест3", 0, false),
+                WordPrediction("тест4", 0, false),
+                WordPrediction("тест5", 0, false)
+            )
         }
     } catch (e: Exception) {
         Log.e("PredictiveEngine", "Error getting predictions for: $currentText", e)
