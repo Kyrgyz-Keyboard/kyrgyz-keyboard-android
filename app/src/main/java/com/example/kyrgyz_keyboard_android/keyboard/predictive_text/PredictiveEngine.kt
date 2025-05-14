@@ -5,29 +5,43 @@ import android.util.Log
 import org.apertium.lttoolbox.process.FSTProcessor
 import java.io.StringReader
 import java.nio.ByteBuffer
+import kotlinx.coroutines.*
 
 class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
     private val binaryKirData = "kir.automorf.bin"
-    private val binaryTriData = "trie.bin"
     private val fstp = FSTProcessor()
-    private var trie: Trie
+    private var trie: Trie = Trie(emptyList())
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     init {
-        val assetManager = context.assets
-        assetManager.open(binaryKirData).use { input ->
-            val buffer = ByteArray(input.available())
-            input.read(buffer)
-            fstp.load(ByteBuffer.wrap(buffer), binaryKirData)
-            fstp.initAnalysis()
-            if (!fstp.valid()) {
-                throw RuntimeException("Validity test for FSTProcessor failed")
-            }
-        }
+        scope.launch {
+            try {
+                val assetManager = context.assets
+                assetManager.open(binaryKirData).use { input ->
+                    val buffer = ByteArray(input.available())
+                    input.read(buffer)
+                    fstp.load(ByteBuffer.wrap(buffer), binaryKirData)
+                    fstp.initAnalysis()
+                    if (!fstp.valid()) {
+                        throw RuntimeException("Validity test for FSTProcessor failed")
+                    }
+                }
 
-        trie = try {
-            Trie.load(context.assets.open(binaryTriData))
-        } catch (e: Exception) {
-            Trie(emptyList())
+                try {
+                    assetManager.open("trie.bin").use { input ->
+                        trie = Trie.load(input)
+                    }
+                } catch (e: OutOfMemoryError) {
+                    Log.e("PredictiveEngine", "Out of memory while loading trie", e)
+                    trie = Trie(emptyList())
+                } catch (e: Exception) {
+                    Log.e("PredictiveEngine", "Failed to load trie", e)
+                    trie = Trie(emptyList())
+                }
+            } catch (e: Exception) {
+                Log.e("PredictiveEngine", "Failed to initialize engine", e)
+                // trie = Trie(emptyList())  // This line is commented out
+            }
         }
     }
 
@@ -57,16 +71,9 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
         if (currentText.isEmpty()) {
             emptyList()
         } else {
-            // val predictions = trie.getPredictions(currentText)
-            // predictions.sortedByDescending { it.freq }
-            //     .take(MAX_SUGGESTIONS)
-            listOf(
-                WordPrediction("тест", 0, false),
-                WordPrediction("тест2", 0, false),
-                WordPrediction("тест3", 0, false),
-                WordPrediction("тест4", 0, false),
-                WordPrediction("тест5", 0, false)
-            )
+            val predictions = trie.getPredictions(currentText)
+            predictions.sortedByDescending { it.freq }
+                .take(MAX_SUGGESTIONS)
         }
     } catch (e: Exception) {
         Log.e("PredictiveEngine", "Error getting predictions for: $currentText", e)
