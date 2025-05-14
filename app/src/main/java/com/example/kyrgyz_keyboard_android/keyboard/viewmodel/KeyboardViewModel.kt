@@ -52,6 +52,10 @@ class KeyboardViewModel : ViewModel() {
         ) }
     }
 
+    fun toggleDarkMode() = viewModelScope.launch {
+        _keyboardState.update { it.copy(isDarkMode = !it.isDarkMode) }
+    }
+
     fun updateCapsLockState(newState: CapsLockState) = viewModelScope.launch {
         _keyboardState.update { it.copy(capsLockState = newState) }
     }
@@ -139,5 +143,6 @@ data class KeyboardState(
     val isSymbolsMode: Boolean = false,
     val isSymbolsLayout2: Boolean = false,
     val isLatinLayout: Boolean = false,
-    val isEnesayLayout: Boolean = false
+    val isEnesayLayout: Boolean = false,
+    val isDarkMode: Boolean = false
 )

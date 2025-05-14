@@ -23,3 +23,12 @@ val EnterImgColor = Color.White
 val KeyTextColor = Color.Black
 val KeyBackgroundColor = Color.White
 val KeyLockedBackgroundColor = Color.LightGray
+
+// Dark Mode Keyboard Colors
+val KeyboardGrayDark = Color(0xFF202124)
+val KeyGrayDark = Color(0xFF3C4043)
+val EnterColorDark = GBoardBlue
+val EnterImgColorDark = Color.White
+val KeyTextColorDark = Color.White
+val KeyBackgroundColorDark = Color(0xFF2E2F31)
+val KeyLockedBackgroundColorDark = Color(0xFF5F6368)

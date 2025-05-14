@@ -22,13 +22,15 @@ import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
 import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants
 import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions
 import com.example.kyrgyz_keyboard_android.ui.theme.EnterImgColor
+import com.example.kyrgyz_keyboard_android.ui.theme.EnterImgColorDark
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyTextColor
+import com.example.kyrgyz_keyboard_android.ui.theme.KeyTextColorDark
 import com.example.kyrgyz_keyboard_android.ui.theme.keyboardTextStyle
 import com.example.kyrgyz_keyboard_android.ui.theme.symbolsBtnTextStyle
 
 @Composable
 fun KeyContent(
-    key: KeyUiModel, capsLockEnabled: CapsLockState, viewModel: KeyboardViewModel
+    key: KeyUiModel, capsLockEnabled: CapsLockState, isDarkMode: Boolean, viewModel: KeyboardViewModel
 ) {
     Box(contentAlignment = Alignment.Center) {
         when {
@@ -38,9 +40,9 @@ fun KeyContent(
                     contentDescription = null,
                     modifier = Modifier.size(Dimensions.keyIconSize),
                     colorFilter = when {
-                        key.img == R.drawable.ic_enter -> ColorFilter.tint(EnterImgColor)
+                        key.img == R.drawable.ic_enter -> ColorFilter.tint(if (isDarkMode) EnterImgColorDark else EnterImgColor)
                         key.img == R.drawable.ic_emoji -> null
-                        else -> ColorFilter.tint(KeyTextColor)
+                        else -> ColorFilter.tint(if (isDarkMode) KeyTextColorDark else KeyTextColor)
                     }
                 )
             }
@@ -71,7 +73,7 @@ fun KeyContent(
                         } else {
                             keyboardTextStyle
                         },
-                        color = KeyTextColor,
+                        color = if (isDarkMode) KeyTextColorDark else KeyTextColor,
                         modifier = Modifier.padding(horizontal = 2.dp)
                     )
 
@@ -81,7 +83,7 @@ fun KeyContent(
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontSize = 10.sp
                             ),
-                            color = KeyTextColor.copy(alpha = 0.5f),
+                            color = if (isDarkMode) KeyTextColorDark.copy(alpha = 0.5f) else KeyTextColor.copy(alpha = 0.5f),
                             modifier = Modifier.align(Alignment.TopEnd)
                                 .padding(end = 2.dp)
                         )

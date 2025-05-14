@@ -24,6 +24,7 @@ import com.example.kyrgyz_keyboard_android.ui.keyboard.components.CapsLockRow
 import com.example.kyrgyz_keyboard_android.ui.keyboard.components.KeyboardRow
 import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyboardGray
+import com.example.kyrgyz_keyboard_android.ui.theme.KeyboardGrayDark
 
 @Composable
 fun HomeScreen(viewModel: KeyboardViewModel = viewModel()) {
@@ -35,11 +36,10 @@ fun HomeScreen(viewModel: KeyboardViewModel = viewModel()) {
         else -> CyrillicUiLayout
     }
 
-    KeyboardContainer {
+    KeyboardContainer(viewModel) {
         SuggestionsRow(
             suggestions = suggestions,
             viewModel = viewModel,
-            modifier = Modifier.padding(bottom = Dimensions.keyboardVerticalPadding),
             isMidWord = keyboardState.isMidWord
         )
 
@@ -52,11 +52,13 @@ fun HomeScreen(viewModel: KeyboardViewModel = viewModel()) {
 }
 
 @Composable
-private fun KeyboardContainer(content: @Composable () -> Unit) {
+private fun KeyboardContainer(viewModel: KeyboardViewModel, content: @Composable () -> Unit) {
+    val keyboardState by viewModel.keyboardState.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(KeyboardGray)
+            .background(if (keyboardState.isDarkMode) KeyboardGrayDark else KeyboardGray)
     ) {
         content()
     }
@@ -66,7 +68,7 @@ private fun KeyboardContainer(content: @Composable () -> Unit) {
 private fun SymbolsLayout(viewModel: KeyboardViewModel) {
     val keyboardState by viewModel.keyboardState.collectAsState()
 
-    KeyboardBase {
+    KeyboardBase(viewModel) {
         KeyboardRow(keys = SymbolsLayout1.symbolsRow1, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
         KeyboardRow(keys = SymbolsLayout1.symbolsRow2, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
         KeyboardRow(keys = SymbolsLayout1.symbolsRow3, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
@@ -83,7 +85,7 @@ private fun SymbolsLayout(viewModel: KeyboardViewModel) {
 private fun SymbolsLayout2(viewModel: KeyboardViewModel) {
     val keyboardState by viewModel.keyboardState.collectAsState()
 
-    KeyboardBase {
+    KeyboardBase(viewModel) {
         KeyboardRow(keys = SymbolsLayout2.symbolsRow1, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
         KeyboardRow(keys = SymbolsLayout2.symbolsRow2, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
         KeyboardRow(keys = SymbolsLayout2.symbolsRow3, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
@@ -102,7 +104,7 @@ private fun MainKeyboardLayout(
     viewModel: KeyboardViewModel,
     layout: Any
 ) {
-    KeyboardBase {
+    KeyboardBase(viewModel) {
         when (layout) {
             is CyrillicUiLayout -> {
                 KeyboardRow(keys = CyrillicUiLayout.row1, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
@@ -130,10 +132,11 @@ private fun MainKeyboardLayout(
 }
 
 @Composable
-private fun KeyboardBase(content: @Composable () -> Unit) {
+private fun KeyboardBase(viewModel: KeyboardViewModel, content: @Composable () -> Unit) {
+    val keyboardState by viewModel.keyboardState.collectAsState()
     Column(
         modifier = Modifier
-            .background(color = KeyboardGray)
+            .background(color = if (keyboardState.isDarkMode) KeyboardGrayDark else KeyboardGray)
             .fillMaxWidth()
             .padding(
                 horizontal = Dimensions.keyboardHorizontalPadding,

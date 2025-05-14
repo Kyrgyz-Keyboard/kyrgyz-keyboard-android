@@ -19,6 +19,9 @@ object KeyboardConstants {
     const val ALPHA_CHARACTER = "абв"
     const val ENESAY_CHARACTER = "\uD803\uDC36\uD803\uDC3B\uD803\uDC0D\uD803\uDC03\uD803\uDC15"
 
+    const val LIGHT = "\uD83C\uDF11"
+    const val DARK = "\uD83C\uDF15"
+
     fun getSpaceCharacter(isLatinLayout: Boolean): String {
         return if (isLatinLayout) LATIN_SPACE else CYRILLIC_SPACE
     }

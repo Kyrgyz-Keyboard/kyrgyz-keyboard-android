@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -20,6 +22,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Alignment
 import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions
+import com.example.kyrgyz_keyboard_android.ui.theme.KeyboardGrayDark
 
 @Composable
 fun SuggestionsRow(
@@ -30,17 +33,18 @@ fun SuggestionsRow(
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val keyboardState by viewModel.keyboardState.collectAsState()
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(KeyboardGray)
+            .background(if (keyboardState.isDarkMode) KeyboardGrayDark else KeyboardGray)
             .padding(horizontal = Dimensions.keyboardHorizontalPadding, vertical = Dimensions.keyboardVerticalPadding)
             .horizontalScroll(scrollState),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         suggestions.forEach { suggestion ->
             SuggestionChip(
-                text = suggestion, onClick = {
+                text = suggestion, isDarkMode = keyboardState.isDarkMode, onClick = {
                     handleSuggestionClick(suggestion, context, viewModel)
                 })
         }
@@ -48,7 +52,7 @@ fun SuggestionsRow(
 }
 
 @Composable
-fun SuggestionChip(text: String, onClick: () -> Unit) {
+fun SuggestionChip(text: String, isDarkMode: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(Dimensions.keyCornerRadius))
@@ -57,7 +61,7 @@ fun SuggestionChip(text: String, onClick: () -> Unit) {
             contentAlignment = Alignment.Center
     ) {
         Text(
-            text = text, style = keyboardTextStyle, color = Color.DarkGray
+            text = text, style = keyboardTextStyle, color = if (isDarkMode) Color.LightGray else Color.DarkGray
         )
     }
 }

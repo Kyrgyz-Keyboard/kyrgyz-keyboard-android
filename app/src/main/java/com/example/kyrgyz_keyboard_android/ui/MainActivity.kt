@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -70,30 +72,32 @@ fun KeyboardSettingsScreen() {
     }
 
     if (showDialog && !isKeyboardEnabled) {
-        AlertDialog(
-            onDismissRequest = {
+        AlertDialog(onDismissRequest = {
             checkKeyboardStatus()
             if (isKeyboardEnabled) {
                 showDialog = false
             }
-        },
-            title = { Text("Баскычтопту иштетүү") },
-            text = { Text("Кыргыз баскычтобун колдонуу үчүн уруксат бериңиз") },
-            confirmButton = {
-                Button(onClick = {
-                    openKeyboardSettings(context)
-                }) {
-                    Text("Уруксат берүү")
-                }
-            },
-            dismissButton = {
-                Button(onClick = {
+        }, title = {
+            Text("Баскычтопту иштетүү")
+        }, text = {
+            Text("Кыргыз баскычтобун колдонуу үчүн уруксат бериңиз")
+        }, confirmButton = {
+            Button(onClick = {
+                openKeyboardSettings(context)
+            }) {
+                Text("Уруксат берүү")
+            }
+        }, dismissButton = {
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Gray
+                ), onClick = {
                     checkKeyboardStatus()
                     showDialog = false
                 }) {
-                    Text("Жабуу")
-                }
-            })
+                Text("Жабуу")
+            }
+        })
     }
 
     Column(
@@ -126,16 +130,14 @@ fun KeyboardSettingsScreen() {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        if (isKeyboardEnabled) {
-            Button(
-                modifier = Modifier
-                    .padding(bottom = 350.dp)
-                    .fillMaxWidth(),
-                onClick = { switchToCustomKeyboard(context) },
-                shape = RoundedCornerShape(Dimensions.keyCornerRadius)
-            ) {
-                Text("Кыргыз баскычтоптусуна өтүү")
-            }
+        Button(
+            modifier = Modifier
+                .padding(bottom = 350.dp)
+                .fillMaxWidth(),
+            onClick = { switchToCustomKeyboard(context) },
+            shape = RoundedCornerShape(Dimensions.keyCornerRadius)
+        ) {
+            Text("Кыргыз баскычтоптусуна өтүү")
         }
     }
 }

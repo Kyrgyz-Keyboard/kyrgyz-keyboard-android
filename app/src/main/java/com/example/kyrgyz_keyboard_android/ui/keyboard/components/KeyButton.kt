@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,9 +24,13 @@ import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
 import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants
 import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions
 import com.example.kyrgyz_keyboard_android.ui.theme.EnterColor
+import com.example.kyrgyz_keyboard_android.ui.theme.EnterColorDark
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyBackgroundColor
+import com.example.kyrgyz_keyboard_android.ui.theme.KeyBackgroundColorDark
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyGray
+import com.example.kyrgyz_keyboard_android.ui.theme.KeyGrayDark
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyLockedBackgroundColor
+import com.example.kyrgyz_keyboard_android.ui.theme.KeyLockedBackgroundColorDark
 import kotlinx.coroutines.delay
 
 @Composable
@@ -35,8 +40,15 @@ fun KeyButton(
     capsLockEnabled: CapsLockState,
     viewModel: KeyboardViewModel
 ) {
+    val keyboardState by viewModel.keyboardState.collectAsState()
     val context = LocalContext.current
     var isBackspacePressed by remember { mutableStateOf(false) }
+
+    val transformedKey = remember(key, keyboardState.isDarkMode) {
+        if (key.ch == KeyboardConstants.LIGHT || key.ch == KeyboardConstants.DARK) {
+            key.copy(ch = if (keyboardState.isDarkMode) KeyboardConstants.DARK else KeyboardConstants.LIGHT)
+        } else key
+    }
 
     LaunchedEffect(isBackspacePressed) {
         if (isBackspacePressed && key.img == R.drawable.ic_remove) {
@@ -64,7 +76,7 @@ fun KeyButton(
     Box(
         modifier = modifier
             .background(
-                color = getBackgroundColor(key),
+                color = getBackgroundColor(key, keyboardState.isDarkMode),
                 shape = RoundedCornerShape(Dimensions.keyCornerRadius)
             )
             .pointerInput(key, capsLockEnabled) {
@@ -82,6 +94,10 @@ fun KeyButton(
                                     viewModel.keyboardState.value.isLatinLayout -> viewModel.toggleCyrillicLayout()
                                     else -> viewModel.toggleLatinLayout()
                                 }
+                            }
+                            transformedKey.ch == KeyboardConstants.DARK
+                                    || transformedKey.ch == KeyboardConstants.LIGHT -> {
+                                viewModel.toggleDarkMode()
                             }
                             key.ch == "=\\<" || key.ch == "?123" -> viewModel.toggleSymbolsLayout()
                             key.ch == KeyboardConstants.SYMBOLS_CHARACTER -> viewModel.toggleKeyboardMode()
@@ -110,13 +126,17 @@ fun KeyButton(
             },
         contentAlignment = Alignment.Center
     ) {
-        KeyContent(key = key, capsLockEnabled = capsLockEnabled, viewModel = viewModel)
+        KeyContent(key = transformedKey, capsLockEnabled = capsLockEnabled, isDarkMode = keyboardState.isDarkMode, viewModel = viewModel)
     }
 }
 
-private fun getBackgroundColor(key: KeyUiModel): Color = when {
-    key.isActive == CapsLockState.LOCKED -> KeyLockedBackgroundColor
-    key.isSpecial && key.img != R.drawable.ic_enter -> KeyGray
-    key.isSpecial && key.img == R.drawable.ic_enter -> EnterColor
-    else -> KeyBackgroundColor
+private fun getBackgroundColor(key: KeyUiModel, isDarkMode: Boolean): Color = when {
+    key.isActive == CapsLockState.LOCKED ->
+        if (isDarkMode) KeyLockedBackgroundColorDark else KeyLockedBackgroundColor
+    key.isSpecial && key.img != R.drawable.ic_enter ->
+        if (isDarkMode) KeyGrayDark else KeyGray
+    key.isSpecial && key.img == R.drawable.ic_enter ->
+        if (isDarkMode) EnterColorDark else EnterColor
+    else ->
+        if (isDarkMode) KeyBackgroundColorDark else KeyBackgroundColor
 }

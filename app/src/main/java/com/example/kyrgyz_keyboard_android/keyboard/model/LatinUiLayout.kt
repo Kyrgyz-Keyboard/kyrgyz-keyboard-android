@@ -11,7 +11,7 @@ object LatinLayout {
         KeyUiModel(ch = "ö"),
         KeyUiModel(ch = "ü"),
         KeyUiModel(isSpecial = true, ch = KeyboardConstants.LATIN_DICT, weight = 2f),
-        KeyUiModel(isSpecial = true, img = R.drawable.ic_emoji)
+        KeyUiModel(isSpecial = true, ch = KeyboardConstants.LIGHT)
     )
 
     val row2 = listOf(

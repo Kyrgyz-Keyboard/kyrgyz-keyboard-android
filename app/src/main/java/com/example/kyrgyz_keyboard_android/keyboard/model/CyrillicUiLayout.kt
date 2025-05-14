@@ -11,7 +11,7 @@ object CyrillicUiLayout {
         KeyUiModel(ch = "ө"),
         KeyUiModel(ch = "ү"),
         KeyUiModel(isSpecial = true, ch = KeyboardConstants.CYRILLIC_DICT, weight = 2f),
-        KeyUiModel(isSpecial = true, img = R.drawable.ic_emoji)
+        KeyUiModel(isSpecial = true, ch = KeyboardConstants.LIGHT)
     )
 
 
