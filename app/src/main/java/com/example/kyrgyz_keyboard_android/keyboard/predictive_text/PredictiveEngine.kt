@@ -2,24 +2,37 @@ package com.example.kyrgyz_keyboard_android.keyboard.predictive_text
 
 import org.apertium.lttoolbox.process.FSTProcessor
 import org.apertium.utils.IOUtils
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.StringReader
 
 class PredictiveTextEngineImpl : PredictiveTextEngine {
 
-    private val binaryKirData = "app/src/main/res/kir.automorf.bin"
-    private val fstp = FSTProcessor()
+    // private val binaryKirData = "app/src/main/res/kir.automorf.bin"
+    // private val fstp = FSTProcessor()
+    object TrieHolder {
+        val trie: Trie by lazy {
+            val file = File("/app/src/main/res/trie.bin")
+            if (!file.exists()) {
+                throw FileNotFoundException("trie.bin not found")
+            }
+            Trie.load(FileInputStream(file))
+        }
+    }
 
-    init {
+
+    /*init {
         fstp.load(IOUtils.openFileAsByteBuffer(binaryKirData), binaryKirData)
         fstp.initAnalysis()
         if (!fstp.valid()) {
             throw RuntimeException("Validity test for FSTProcessor failed")
         }
-    }
+    }*/
 
     fun getWordStem(word: String): String {
         val output = StringBuilder()
-        fstp.analysis(StringReader(word + '\n'), output)
+        // fstp.analysis(StringReader(word + '\n'), output)
 
         return output.toString()
             .removePrefix("^")
@@ -34,19 +47,15 @@ class PredictiveTextEngineImpl : PredictiveTextEngine {
             .minOrNull() ?: word
     }
 
-    override fun getPredictions(currentText: String): List<WordPrediction> {
-        TODO("Not yet implemented")
-    }
+    override fun getPredictions(currentText: String): List<WordPrediction> = TrieHolder.trie.getPredictions(currentText)
 
-    override fun getNextWordPredictions(previousWords: String): List<WordPrediction> {
-        TODO("Not yet implemented")
-    }
+    override fun getNextWordPredictions(previousWords: String): List<WordPrediction> = TrieHolder.trie.getNextWordPredictions(previousWords)
 }
 
 fun main() {
     // LTProc.doMain(arrayOf(binaryKirData), input, output)
 
     val predictiveEngine = PredictiveTextEngineImpl()
-    println(predictiveEngine.getWordStem("боюнча"))
+    println(predictiveEngine.getWordStem("в"))
     println(predictiveEngine.getWordStem("экрандарынын"))
 }

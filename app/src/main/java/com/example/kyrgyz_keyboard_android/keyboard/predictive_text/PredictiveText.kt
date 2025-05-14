@@ -2,7 +2,8 @@ package com.example.kyrgyz_keyboard_android.keyboard.predictive_text
 
 data class WordPrediction(
     val word: String,
-    val confidence: Float
+    val freq: Int,
+    val isStem: Boolean
 )
 
 interface PredictiveTextEngine {

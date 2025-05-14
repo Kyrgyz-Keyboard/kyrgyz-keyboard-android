@@ -29,13 +29,13 @@ class DummyPredictiveEngine : PredictiveTextEngine {
 
         // Exact match
         wordDatabase[text]?.let { words ->
-            return words.map { WordPrediction(word = it, confidence = 1.0f) }
+            return words.map { WordPrediction(word = it, freq = 0, isStem = true) }
         }
 
         // If no exact match, finds the key that matches our current text
         return wordDatabase.entries
             .firstOrNull { (key, _) -> key == text }
-            ?.value?.map { WordPrediction(word = it, confidence = 1.0f) }
+            ?.value?.map { WordPrediction(word = it, freq = 0, isStem = true) }
             ?: emptyList()
     }
 
@@ -47,13 +47,13 @@ class DummyPredictiveEngine : PredictiveTextEngine {
             lastWord.isEmpty() -> {
                 // At the start of input or after space
                 nextWordDatabase[""]?.map { word ->
-                    WordPrediction(word = word, confidence = 1.0f)
+                    WordPrediction(word = word, freq = 0, isStem = true)
                 } ?: emptyList()
             }
             nextWordDatabase.containsKey(lastWord.lowercase()) -> {
                 // Found exact match in next word database
                 nextWordDatabase[lastWord.lowercase()]!!.map { word ->
-                    WordPrediction(word = word, confidence = 1.0f)
+                    WordPrediction(word = word, freq = 0, isStem = true)
                 }
             }
             else -> {
