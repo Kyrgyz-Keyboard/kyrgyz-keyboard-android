@@ -29,13 +29,13 @@ class DummyPredictiveEngine : PredictiveTextEngine {
 
         // Exact match
         wordDatabase[text]?.let { words ->
-            return words.map { WordPrediction(word = it, freq = 0, isStem = true) }
+            return words.map { WordPrediction(word = it, isStem = true) }
         }
 
         // If no exact match, finds the key that matches our current text
         return wordDatabase.entries
             .firstOrNull { (key, _) -> key == text }
-            ?.value?.map { WordPrediction(word = it, freq = 0, isStem = true) }
+            ?.value?.map { WordPrediction(word = it, isStem = true) }
             ?: emptyList()
     }
 

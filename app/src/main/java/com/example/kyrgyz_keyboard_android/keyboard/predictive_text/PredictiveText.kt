@@ -1,8 +1,7 @@
 package com.example.kyrgyz_keyboard_android.keyboard.predictive_text
 
-data class WordPrediction(
+class WordPrediction(
     val word: String,
-    val freq: Int,
     val isStem: Boolean
 )
 

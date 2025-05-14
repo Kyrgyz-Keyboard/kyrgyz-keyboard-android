@@ -85,7 +85,7 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
             emptyList()
         } else {
             val predictions = trie.getPredictions(currentText)
-            predictions.sortedByDescending { it.freq }
+            predictions
                 .take(MAX_SUGGESTIONS)
         }
     } catch (e: Exception) {

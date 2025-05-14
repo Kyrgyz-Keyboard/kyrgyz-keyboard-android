@@ -33,7 +33,7 @@ class MappedTrie(
 
         for ((i, word) in words.withIndex()) {
             if (word.startsWith(prefix)) {
-                result.add(WordPrediction(word, freq = 1, isStem = false))
+                result.add(WordPrediction(word, isStem = false))
             }
             if (result.size >= 9) break
         }
