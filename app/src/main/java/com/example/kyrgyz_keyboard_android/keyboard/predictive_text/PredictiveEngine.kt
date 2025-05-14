@@ -5,30 +5,26 @@ import org.apertium.utils.IOUtils
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
-import java.io.StringReader
 
 class PredictiveTextEngineImpl : PredictiveTextEngine {
 
-    // private val binaryKirData = "app/src/main/res/kir.automorf.bin"
-    // private val fstp = FSTProcessor()
-    object TrieHolder {
-        val trie: Trie by lazy {
-            val file = File("/app/src/main/res/trie.bin")
-            if (!file.exists()) {
-                throw FileNotFoundException("trie.bin not found")
-            }
-            Trie.load(FileInputStream(file))
-        }
-    }
+    private val binaryKirData = "app/src/main/res/kir.automorf.bin"
+    private val fstp = FSTProcessor()
+    private val trie: Trie
 
-
-    /*init {
+    init {
         fstp.load(IOUtils.openFileAsByteBuffer(binaryKirData), binaryKirData)
         fstp.initAnalysis()
         if (!fstp.valid()) {
             throw RuntimeException("Validity test for FSTProcessor failed")
         }
-    }*/
+
+        val file = File("app/src/main/res/trie.bin")
+        if (!file.exists()) {
+            throw FileNotFoundException("trie.bin not found")
+        }
+        trie = Trie.load(FileInputStream(file))
+    }
 
     fun getWordStem(word: String): String {
         val output = StringBuilder()
@@ -47,9 +43,11 @@ class PredictiveTextEngineImpl : PredictiveTextEngine {
             .minOrNull() ?: word
     }
 
-    override fun getPredictions(currentText: String): List<WordPrediction> = TrieHolder.trie.getPredictions(currentText)
+    override fun getPredictions(currentText: String): List<WordPrediction> =
+        trie.getPredictions(currentText)
 
-    override fun getNextWordPredictions(previousWords: String): List<WordPrediction> = TrieHolder.trie.getNextWordPredictions(previousWords)
+    override fun getNextWordPredictions(previousWords: String): List<WordPrediction> =
+        trie.getNextWordPredictions(previousWords)
 }
 
 fun main() {

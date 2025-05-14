@@ -2,7 +2,7 @@ package com.example.kyrgyz_keyboard_android.keyboard.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kyrgyz_keyboard_android.keyboard.predictive_text.DummyPredictiveEngine
+import com.example.kyrgyz_keyboard_android.keyboard.predictive_text.PredictiveTextEngineImpl
 import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class KeyboardViewModel : ViewModel() {
-    private val predictiveEngine = DummyPredictiveEngine()
+    private val predictiveEngine = PredictiveTextEngineImpl()
 
     private val _keyboardState = MutableStateFlow(KeyboardState())
     val keyboardState: StateFlow<KeyboardState> = _keyboardState.asStateFlow()
