@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import com.example.kyrgyz_keyboard_android.keyboard.model.CyrillicUiLayout
@@ -142,7 +143,7 @@ private fun KeyboardBase(viewModel: KeyboardViewModel, content: @Composable () -
                 horizontal = Dimensions.keyboardHorizontalPadding,
                 vertical = Dimensions.keyboardVerticalPadding
             )
-            .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
+            .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 12.dp)
     ) {
         content()
     }
