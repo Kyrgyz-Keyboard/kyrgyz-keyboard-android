@@ -4,46 +4,59 @@ import android.content.Context
 import android.util.Log
 import org.apertium.lttoolbox.process.FSTProcessor
 import java.io.StringReader
-import java.nio.ByteBuffer
 import kotlinx.coroutines.*
+import java.nio.MappedByteBuffer
 
 class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
     private val binaryKirData = "kir.automorf.bin"
     private val fstp = FSTProcessor()
-    private var trie: Trie = Trie(emptyList())
+    private var trie: PredictiveTextEngine = Trie(emptyList())
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    @Volatile
+    private var ready = false
+
 
     init {
         scope.launch {
+            ready = true
             try {
-                val assetManager = context.assets
-                assetManager.open(binaryKirData).use { input ->
-                    val buffer = ByteArray(input.available())
-                    input.read(buffer)
-                    fstp.load(ByteBuffer.wrap(buffer), binaryKirData)
-                    fstp.initAnalysis()
-                    if (!fstp.valid()) {
-                        throw RuntimeException("Validity test for FSTProcessor failed")
-                    }
-                }
+                val trieFile = copyAssetToFile(context, "trie.bin", "trie_mapped.bin")
+                val buffer = mapFile(context, trieFile)
 
-                try {
-                    assetManager.open("trie.bin").use { input ->
-                        trie = Trie.load(input)
-                    }
-                } catch (e: OutOfMemoryError) {
-                    Log.e("PredictiveEngine", "Out of memory while loading trie", e)
-                    trie = Trie(emptyList())
-                } catch (e: Exception) {
-                    Log.e("PredictiveEngine", "Failed to load trie", e)
-                    trie = Trie(emptyList())
-                }
+                val countBytes = ByteArray(3)
+                buffer.get(countBytes)
+                val wordCount = (countBytes[0].toInt() and 0xFF shl 16) or
+                        (countBytes[1].toInt() and 0xFF shl 8) or
+                        (countBytes[2].toInt() and 0xFF)
+
+                val words = readWordsFromBuffer(buffer, wordCount, maxWords = 3000)
+                trie = MappedTrie(words, buffer)
             } catch (e: Exception) {
-                Log.e("PredictiveEngine", "Failed to initialize engine", e)
-                // trie = Trie(emptyList())  // This line is commented out
+                Log.e("PredictiveEngine", "Failed to load mapped trie", e)
+                trie = Trie(emptyList())
             }
         }
     }
+
+    fun readWordsFromBuffer(buffer: MappedByteBuffer, wordCount: Int, maxWords: Int): List<String> {
+        val words = mutableListOf<String>()
+        var read = 0
+        while (read < minOf(wordCount, maxWords) && buffer.hasRemaining()) {
+            val sb = StringBuilder()
+            while (true) {
+                if (!buffer.hasRemaining()) break
+                val b = buffer.get()
+                if (b == 0.toByte()) break
+                sb.append(BYTE_TO_CHAR[b] ?: '?')
+            }
+            words.add(sb.toString())
+            read++
+        }
+        return words
+    }
+
+    fun isReady(): Boolean = ready
 
     fun getWordStem(word: String): String {
         val output = StringBuilder()

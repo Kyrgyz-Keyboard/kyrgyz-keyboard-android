@@ -63,10 +63,15 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         _keyboardState.update { it.copy(capsLockState = newState) }
     }
 
-    private fun updateSuggestions() {
+    private fun updateSuggestions() = viewModelScope.launch {
         try {
+            repeat(10) {
+                if (predictiveEngine.isReady()) return@repeat
+                kotlinx.coroutines.delay(50)
+            }
+
             val currentState = _keyboardState.value
-            val predictions = predictiveEngine.getPredictions(currentState.inputBuffer)
+            val predictions = predictiveEngine.getPredictions(currentState.currentWord)
             _suggestions.value = predictions.map { it.word }
         } catch (e: OutOfMemoryError) {
             _suggestions.value = emptyList()
