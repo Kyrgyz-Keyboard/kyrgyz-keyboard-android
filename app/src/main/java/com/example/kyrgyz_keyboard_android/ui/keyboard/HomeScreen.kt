@@ -143,7 +143,7 @@ private fun KeyboardBase(viewModel: KeyboardViewModel, content: @Composable () -
                 horizontal = Dimensions.keyboardHorizontalPadding,
                 vertical = Dimensions.keyboardVerticalPadding
             )
-            .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 16.dp)
+            .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 10.dp)
     ) {
         content()
     }

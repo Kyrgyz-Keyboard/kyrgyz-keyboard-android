@@ -41,7 +41,6 @@ fun KeyContent(
                     modifier = Modifier.size(Dimensions.keyIconSize),
                     colorFilter = when {
                         key.img == R.drawable.ic_enter -> ColorFilter.tint(if (isDarkMode) EnterImgColorDark else EnterImgColor)
-                        key.img == R.drawable.ic_emoji -> null
                         else -> ColorFilter.tint(if (isDarkMode) KeyTextColorDark else KeyTextColor)
                     }
                 )

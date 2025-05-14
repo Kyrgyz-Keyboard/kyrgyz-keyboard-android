@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,6 +44,8 @@ fun KeyButton(
     val keyboardState by viewModel.keyboardState.collectAsState()
     val context = LocalContext.current
     var isBackspacePressed by remember { mutableStateOf(false) }
+    var firstTapTime by remember { mutableLongStateOf(0L) }
+    var waitingForSecondTap by remember { mutableStateOf(false) }
 
     val transformedKey = remember(key, keyboardState.isDarkMode) {
         if (key.ch == KeyboardConstants.LIGHT || key.ch == KeyboardConstants.DARK) {
@@ -108,20 +111,30 @@ fun KeyButton(
                     },
                     onTap = {
                         if (key.img == R.drawable.ic_caps) {
-                            viewModel.updateCapsLockState(
-                                if (capsLockEnabled == CapsLockState.OFF) CapsLockState.TEMPORARY
-                                else CapsLockState.OFF
-                            )
+                            val currentTime = System.currentTimeMillis()
+                            if (waitingForSecondTap && currentTime - firstTapTime < 300) {
+                                // Double tap detected
+                                viewModel.updateCapsLockState(CapsLockState.LOCKED)
+                                waitingForSecondTap = false
+                            } else {
+                                // First tap
+                                firstTapTime = currentTime
+                                waitingForSecondTap = true
+                                viewModel.updateCapsLockState(
+                                    if (capsLockEnabled == CapsLockState.OFF) CapsLockState.TEMPORARY
+                                    else CapsLockState.OFF
+                                )
+                            }
                         }
                     },
-                    onDoubleTap = {
-                        if (key.img == R.drawable.ic_caps) {
-                            viewModel.updateCapsLockState(
-                                if (capsLockEnabled != CapsLockState.LOCKED) CapsLockState.LOCKED
-                                else CapsLockState.OFF
-                            )
-                        }
-                    },
+//                    onDoubleTap = {
+//                        if (key.img == R.drawable.ic_caps) {
+//                            viewModel.updateCapsLockState(
+//                                if (capsLockEnabled != CapsLockState.LOCKED) CapsLockState.LOCKED
+//                                else CapsLockState.OFF
+//                            )
+//                        }
+//                    },
                     onLongPress = {
                         if (key.img == R.drawable.ic_caps) {
                             viewModel.updateCapsLockState(
