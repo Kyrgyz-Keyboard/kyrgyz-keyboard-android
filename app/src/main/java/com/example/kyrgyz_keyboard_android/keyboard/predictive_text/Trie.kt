@@ -1,21 +1,58 @@
 package com.example.kyrgyz_keyboard_android.keyboard.predictive_text
-import java.io.File
-import java.io.FileInputStream
+
 import java.io.InputStream
-import com.example.kyrgyz_keyboard_android.keyboard.predictive_text.WordPrediction
+
 data class TrieNode(
     var freq: Int = 0,
     val children: MutableMap<Pair<Boolean, Int>, TrieNode> = mutableMapOf()
 )
+
 const val RETURN_MARKER: Int = 1 shl 7
 const val STEM_MARKER: Int = 1 shl 6
+
 val DECODING_TABLE = listOf(
     ',', '.', ':'
 ) + ('0'..'9') + ('a'..'z') + listOf(
-    'а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я',
-    'ң','ү','ө'
+    'а',
+    'б',
+    'в',
+    'г',
+    'д',
+    'е',
+    'ё',
+    'ж',
+    'з',
+    'и',
+    'й',
+    'к',
+    'л',
+    'м',
+    'н',
+    'о',
+    'п',
+    'р',
+    'с',
+    'т',
+    'у',
+    'ф',
+    'х',
+    'ц',
+    'ч',
+    'ш',
+    'щ',
+    'ъ',
+    'ы',
+    'ь',
+    'э',
+    'ю',
+    'я',
+    'ң',
+    'ү',
+    'ө'
 )
+
 val BYTE_TO_CHAR = DECODING_TABLE.mapIndexed { index, c -> (index + 1).toByte() to c }.toMap()
+
 class Trie(private val words: List<String>) {
     private val root = TrieNode()
     private val reverseIndex = words.mapIndexed { i, w -> i to w }.toMap()
@@ -30,6 +67,7 @@ class Trie(private val words: List<String>) {
         }
         dfs(root)
     }
+
     fun getPredictions(currentText: String): List<WordPrediction> {
         val prefix = currentText.trim()
         val results = mutableListOf<WordPrediction>()
@@ -42,6 +80,7 @@ class Trie(private val words: List<String>) {
         }
         return results.take(5)
     }
+
     fun getNextWordPredictions(previousWords: String): List<WordPrediction> {
         val inputWords = previousWords.trim().split(" ").filter { it.isNotEmpty() }
         var node = root
@@ -68,11 +107,13 @@ class Trie(private val words: List<String>) {
         }.sortedWith(
             compareBy<WordPrediction> { it.isStem }
                 .thenByDescending { it.word.split(" ").size }
-                .thenBy{1}
+                .thenBy { 1 }
         ).take(5)
     }
+
     companion object {
         fun load(input: InputStream): Trie {
+            println("Trie loading...")
             val countBytes = ByteArray(3)
             input.read(countBytes)
             val wordCount = (countBytes[0].toInt() and 0xFF shl 16) or
@@ -92,6 +133,7 @@ class Trie(private val words: List<String>) {
             loadNode(trie.root, input)
             return trie
         }
+
         private fun loadNode(root: TrieNode, input: InputStream) {
             val stack = ArrayDeque<Pair<TrieNode, Int>>() // Stack of (node, layer)
             stack.addLast(root to 1)
@@ -103,13 +145,13 @@ class Trie(private val words: List<String>) {
                 if (byte1 == -1) break
                 val b = byte1.toByte()
 
-                if (b.toInt() and RETURN_MARKER != 0) {
+                if ((b.toInt() and RETURN_MARKER) != 0) {
                     stack.removeLast()
                     continue
                 }
 
-                val isStem = b.toInt() and STEM_MARKER.toInt() != 0
-                val high = b.toInt() and (RETURN_MARKER or STEM_MARKER).inv()
+                val isStem = (b.toInt() and STEM_MARKER.toInt()) != 0
+                val high = b.toInt() and (STEM_MARKER).inv()
 
                 val byte2 = input.read()
                 val byte3 = input.read()
