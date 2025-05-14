@@ -84,6 +84,7 @@ fun KeyboardSettingsScreen() {
         }, confirmButton = {
             Button(onClick = {
                 openKeyboardSettings(context)
+                showDialog = false
             }) {
                 Text("Уруксат берүү")
             }
