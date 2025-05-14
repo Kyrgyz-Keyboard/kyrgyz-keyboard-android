@@ -39,27 +39,27 @@ class DummyPredictiveEngine : PredictiveTextEngine {
             ?: emptyList()
     }
 
-    override fun getNextWordPredictions(previousWords: String): List<WordPrediction> {
-        val words = previousWords.trim().split(" ")
-        val lastWord = words.lastOrNull() ?: ""
-
-        return when {
-            lastWord.isEmpty() -> {
-                // At the start of input or after space
-                nextWordDatabase[""]?.map { word ->
-                    WordPrediction(word = word, freq = 0, isStem = true)
-                } ?: emptyList()
-            }
-            nextWordDatabase.containsKey(lastWord.lowercase()) -> {
-                // Found exact match in next word database
-                nextWordDatabase[lastWord.lowercase()]!!.map { word ->
-                    WordPrediction(word = word, freq = 0, isStem = true)
-                }
-            }
-            else -> {
-                // If no exact match in next word database, gives word predictions
-                getPredictions(lastWord)
-            }
-        }
-    }
+    // override fun getNextWordPredictions(previousWords: String): List<WordPrediction> {
+    //     val words = previousWords.trim().split(" ")
+    //     val lastWord = words.lastOrNull() ?: ""
+    //
+    //     return when {
+    //         lastWord.isEmpty() -> {
+    //             // At the start of input or after space
+    //             nextWordDatabase[""]?.map { word ->
+    //                 WordPrediction(word = word, freq = 0, isStem = true)
+    //             } ?: emptyList()
+    //         }
+    //         nextWordDatabase.containsKey(lastWord.lowercase()) -> {
+    //             // Found exact match in next word database
+    //             nextWordDatabase[lastWord.lowercase()]!!.map { word ->
+    //                 WordPrediction(word = word, freq = 0, isStem = true)
+    //             }
+    //         }
+    //         else -> {
+    //             // If no exact match in next word database, gives word predictions
+    //             getPredictions(lastWord)
+    //         }
+    //     }
+    // }
 }

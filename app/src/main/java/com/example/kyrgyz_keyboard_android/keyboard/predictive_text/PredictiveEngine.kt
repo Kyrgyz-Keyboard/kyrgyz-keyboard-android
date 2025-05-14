@@ -46,8 +46,8 @@ class PredictiveTextEngineImpl : PredictiveTextEngine {
     override fun getPredictions(currentText: String): List<WordPrediction> =
         trie.getPredictions(currentText)
 
-    override fun getNextWordPredictions(previousWords: String): List<WordPrediction> =
-        trie.getNextWordPredictions(previousWords)
+    // override fun getNextWordPredictions(previousWords: String): List<WordPrediction> =
+    //     trie.getNextWordPredictions(previousWords)
 }
 
 fun main() {

@@ -8,5 +8,5 @@ data class WordPrediction(
 
 interface PredictiveTextEngine {
     fun getPredictions(currentText: String): List<WordPrediction>
-    fun getNextWordPredictions(previousWords: String): List<WordPrediction>
+    // fun getNextWordPredictions(previousWords: String): List<WordPrediction>
 }

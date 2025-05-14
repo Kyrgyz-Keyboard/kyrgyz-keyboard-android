@@ -54,8 +54,10 @@ val DECODING_TABLE = listOf(
 val BYTE_TO_CHAR = DECODING_TABLE.mapIndexed { index, c -> (index + 1).toByte() to c }.toMap()
 
 class Trie(private val words: List<String>) {
+
     private val root = TrieNode()
     private val reverseIndex = words.mapIndexed { i, w -> i to w }.toMap()
+
     fun print() {
         fun dfs(node: TrieNode, depth: Int = 0) {
             for ((key, child) in node.children) {
@@ -68,20 +70,20 @@ class Trie(private val words: List<String>) {
         dfs(root)
     }
 
-    fun getPredictions(currentText: String): List<WordPrediction> {
-        val prefix = currentText.trim()
-        val results = mutableListOf<WordPrediction>()
-        for ((key, child) in root.children) {
-            val (isStem, wordIndex) = key
-            val word = words.getOrNull(wordIndex) ?: continue
-            if (word.startsWith(prefix)) {
-                results.add(WordPrediction(word, child.freq, isStem))
-            }
-        }
-        return results.take(5)
-    }
+    // fun getPredictions(currentText: String): List<WordPrediction> {
+    //     val prefix = currentText.trim()
+    //     val results = mutableListOf<WordPrediction>()
+    //     for ((key, child) in root.children) {
+    //         val (isStem, wordIndex) = key
+    //         val word = words.getOrNull(wordIndex) ?: continue
+    //         if (word.startsWith(prefix)) {
+    //             results.add(WordPrediction(word, child.freq, isStem))
+    //         }
+    //     }
+    //     return results.take(5)
+    // }
 
-    fun getNextWordPredictions(previousWords: String): List<WordPrediction> {
+    fun getPredictions(previousWords: String): List<WordPrediction> {
         val inputWords = previousWords.trim().split(" ").filter { it.isNotEmpty() }
         var node = root
         for (word in inputWords) {
@@ -131,6 +133,7 @@ class Trie(private val words: List<String>) {
             }
             val trie = Trie(words)
             loadNode(trie.root, input)
+            println("Trie loaded with ${words.size} words")
             return trie
         }
 
@@ -150,8 +153,8 @@ class Trie(private val words: List<String>) {
                     continue
                 }
 
-                val isStem = (b.toInt() and STEM_MARKER.toInt()) != 0
-                val high = b.toInt() and (STEM_MARKER).inv()
+                val isStem = (b.toInt() and STEM_MARKER) != 0
+                val high = b.toInt() and STEM_MARKER.inv()
 
                 val byte2 = input.read()
                 val byte3 = input.read()

@@ -62,10 +62,12 @@ class KeyboardViewModel : ViewModel() {
 
     private fun updateSuggestions() {
         val currentState = _keyboardState.value
-        val predictions = when {
-            currentState.isMidWord -> predictiveEngine.getPredictions(currentState.currentWord.lowercase())
-            else -> predictiveEngine.getNextWordPredictions(currentState.inputBuffer)
-        }
+        // val predictions = when {
+        //     currentState.isMidWord -> predictiveEngine.getPredictions(currentState.currentWord.lowercase())
+        //     else -> predictiveEngine.getNextWordPredictions(currentState.inputBuffer)
+        // }
+        // TODO: We don't need isMidWord
+        val predictions = predictiveEngine.getPredictions(currentState.inputBuffer)
         _suggestions.value = predictions.map { it.word }
     }
 
