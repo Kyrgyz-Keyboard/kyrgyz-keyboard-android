@@ -1,5 +1,7 @@
 package com.example.kyrgyz_keyboard_android.keyboard.viewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kyrgyz_keyboard_android.keyboard.predictive_text.PredictiveTextEngineImpl
@@ -10,18 +12,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class KeyboardViewModel : ViewModel() {
-    private val predictiveEngine = PredictiveTextEngineImpl()
-
+class KeyboardViewModel(application: Application) : AndroidViewModel(application) {
+    private val predictiveEngine by lazy {
+        PredictiveTextEngineImpl(application)
+    }
     private val _keyboardState = MutableStateFlow(KeyboardState())
     val keyboardState: StateFlow<KeyboardState> = _keyboardState.asStateFlow()
 
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
     val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
 
-    init {
-        updateSuggestions()
-    }
+//    init {
+//        updateSuggestions()
+//    }
 
     fun toggleKeyboardMode() = viewModelScope.launch {
         _keyboardState.update { it.copy(isSymbolsMode = !it.isSymbolsMode) }
@@ -61,14 +64,13 @@ class KeyboardViewModel : ViewModel() {
     }
 
     private fun updateSuggestions() {
-        val currentState = _keyboardState.value
-        // val predictions = when {
-        //     currentState.isMidWord -> predictiveEngine.getPredictions(currentState.currentWord.lowercase())
-        //     else -> predictiveEngine.getNextWordPredictions(currentState.inputBuffer)
-        // }
-        // TODO: We don't need isMidWord
-        val predictions = predictiveEngine.getPredictions(currentState.inputBuffer)
-        _suggestions.value = predictions.map { it.word }
+        try {
+            val currentState = _keyboardState.value
+            val predictions = predictiveEngine.getPredictions(currentState.inputBuffer)
+            _suggestions.value = predictions.map { it.word }
+        } catch (e: OutOfMemoryError) {
+            _suggestions.value = emptyList()
+        }
     }
 
     fun onTextInput(text: String) = viewModelScope.launch {

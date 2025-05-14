@@ -1,34 +1,48 @@
 package com.example.kyrgyz_keyboard_android.keyboard.predictive_text
 
+import android.content.Context
+import android.util.Log
 import org.apertium.lttoolbox.process.FSTProcessor
-import org.apertium.utils.IOUtils
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileNotFoundException
+import java.io.StringReader
+import java.nio.ByteBuffer
 
-class PredictiveTextEngineImpl : PredictiveTextEngine {
-
-    private val binaryKirData = "app/src/main/res/kir.automorf.bin"
+class PredictiveTextEngineImpl(private val context: Context) : PredictiveTextEngine {
+    private val binaryKirData = "kir.automorf.bin"
     private val fstp = FSTProcessor()
-    private val trie: Trie
+    private lateinit var trie: Trie
 
     init {
-        fstp.load(IOUtils.openFileAsByteBuffer(binaryKirData), binaryKirData)
-        fstp.initAnalysis()
-        if (!fstp.valid()) {
-            throw RuntimeException("Validity test for FSTProcessor failed")
-        }
+        try {
+            val assetManager = context.assets
+            assetManager.open(binaryKirData).use { input ->
+                val buffer = ByteArray(input.available())
+                input.read(buffer)
+                fstp.load(ByteBuffer.wrap(buffer), binaryKirData)
+                fstp.initAnalysis()
+                if (!fstp.valid()) {
+                    throw RuntimeException("Validity test for FSTProcessor failed")
+                }
+            }
 
-        val file = File("app/src/main/res/trie.bin")
-        if (!file.exists()) {
-            throw FileNotFoundException("trie.bin not found")
+            try {
+                trie = Trie.load(context.assets.open("trie.bin"))
+            } catch (e: Exception) {
+                trie = Trie(emptyList())
+            }
+        } catch (e: Exception) {
+            Log.e("PredictiveEngine", "Failed to initialize engine", e)
+            trie = Trie(emptyList())
         }
-        trie = Trie.load(FileInputStream(file))
     }
 
     fun getWordStem(word: String): String {
         val output = StringBuilder()
-        // fstp.analysis(StringReader(word + '\n'), output)
+        try {
+            fstp.analysis(StringReader(word + '\n'), output)
+        } catch (e: Exception) {
+            Log.e("PredictiveEngine", "Error analyzing word: $word", e)
+            return word
+        }
 
         return output.toString()
             .removePrefix("^")
@@ -43,17 +57,20 @@ class PredictiveTextEngineImpl : PredictiveTextEngine {
             .minOrNull() ?: word
     }
 
-    override fun getPredictions(currentText: String): List<WordPrediction> =
-        trie.getPredictions(currentText)
+    override fun getPredictions(currentText: String): List<WordPrediction> = try {
+        if (currentText.isEmpty()) {
+            emptyList()
+        } else {
+            val predictions = trie.getPredictions(currentText)
+            predictions.sortedByDescending { it.freq }
+                .take(MAX_SUGGESTIONS)
+        }
+    } catch (e: Exception) {
+        Log.e("PredictiveEngine", "Error getting predictions for: $currentText", e)
+        emptyList()
+    }
 
-    // override fun getNextWordPredictions(previousWords: String): List<WordPrediction> =
-    //     trie.getNextWordPredictions(previousWords)
-}
-
-fun main() {
-    // LTProc.doMain(arrayOf(binaryKirData), input, output)
-
-    val predictiveEngine = PredictiveTextEngineImpl()
-    println(predictiveEngine.getWordStem("в"))
-    println(predictiveEngine.getWordStem("экрандарынын"))
+    companion object {
+        private const val MAX_SUGGESTIONS = 5
+    }
 }

@@ -70,47 +70,17 @@ class Trie(private val words: List<String>) {
         dfs(root)
     }
 
-    // fun getPredictions(currentText: String): List<WordPrediction> {
-    //     val prefix = currentText.trim()
-    //     val results = mutableListOf<WordPrediction>()
-    //     for ((key, child) in root.children) {
-    //         val (isStem, wordIndex) = key
-    //         val word = words.getOrNull(wordIndex) ?: continue
-    //         if (word.startsWith(prefix)) {
-    //             results.add(WordPrediction(word, child.freq, isStem))
-    //         }
-    //     }
-    //     return results.take(5)
-    // }
-
-    fun getPredictions(previousWords: String): List<WordPrediction> {
-        val inputWords = previousWords.trim().split(" ").filter { it.isNotEmpty() }
-        var node = root
-        for (word in inputWords) {
-            val idx = words.indexOf(word)
-            if (idx == -1) return emptyList()
-            val key = node.children.keys.find { it.second == idx }
-            if (key != null) {
-                node = node.children[key]!!
-            } else {
-                return emptyList()
+    fun getPredictions(currentText: String): List<WordPrediction> {
+        val prefix = currentText.trim()
+        val results = mutableListOf<WordPrediction>()
+        for ((key, child) in root.children) {
+            val (isStem, wordIndex) = key
+            val word = words.getOrNull(wordIndex) ?: continue
+            if (word.startsWith(prefix)) {
+                results.add(WordPrediction(word, child.freq, isStem))
             }
         }
-        return node.children.entries.withIndex().mapNotNull { (i, entry) ->
-            val (key, child) = entry
-            val (isStem, wordIndex) = key
-            val word = words.getOrNull(wordIndex) ?: return@mapNotNull null
-            val fullText = inputWords + word
-            WordPrediction(
-                word = fullText.joinToString(" "),
-                freq = child.freq,
-                isStem = isStem,
-            )
-        }.sortedWith(
-            compareBy<WordPrediction> { it.isStem }
-                .thenByDescending { it.word.split(" ").size }
-                .thenBy { 1 }
-        ).take(5)
+        return results.take(5)
     }
 
     companion object {
