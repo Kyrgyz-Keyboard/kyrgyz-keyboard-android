@@ -2,67 +2,32 @@ package com.example.kyrgyz_keyboard_android.keyboard.predictive_text
 
 import java.io.InputStream
 
-class TrieNode(
-    val children: MutableMap<Pair<Boolean, Int>, TrieNode> = mutableMapOf()
-)
-
 const val RETURN_MARKER: Int = 1 shl 7
 const val STEM_MARKER: Int = 1 shl 6
 
 val DECODING_TABLE = listOf(
     ',', '.', ':'
 ) + ('0'..'9') + ('a'..'z') + listOf(
-    'а',
-    'б',
-    'в',
-    'г',
-    'д',
-    'е',
-    'ё',
-    'ж',
-    'з',
-    'и',
-    'й',
-    'к',
-    'л',
-    'м',
-    'н',
-    'о',
-    'п',
-    'р',
-    'с',
-    'т',
-    'у',
-    'ф',
-    'х',
-    'ц',
-    'ч',
-    'ш',
-    'щ',
-    'ъ',
-    'ы',
-    'ь',
-    'э',
-    'ю',
-    'я',
-    'ң',
-    'ү',
-    'ө'
+    'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м',
+    'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ',
+    'ы', 'ь', 'э', 'ю', 'я', 'ң', 'ү', 'ө'
 )
 
 val BYTE_TO_CHAR = DECODING_TABLE.mapIndexed { index, c -> (index + 1).toByte() to c }.toMap()
 
 class Trie(private val words: List<String>) : PredictiveTextEngine {
 
-    private val root = TrieNode()
+    private val root = mutableMapOf<Pair<Boolean, Int>, MutableMap<*, *>>()
     private val reverseIndex = words.mapIndexed { i, w -> i to w }.toMap()
 
     fun print() {
-        fun dfs(node: TrieNode, depth: Int = 0) {
-            for ((key, child) in node.children) {
+        fun dfs(node: MutableMap<Pair<Boolean, Int>, *>, depth: Int = 0) {
+            for ((key, childAny) in node) {
+                @Suppress("UNCHECKED_CAST")
+                val child = childAny as? MutableMap<Pair<Boolean, Int>, *> ?: continue
                 val (isStem, index) = key
                 val word = reverseIndex[index] ?: "<?>"
-                println("  ".repeat(depth) + "- $word (${if (isStem) "stem" else "step"}")
+                println("  ".repeat(depth) + "- $word (${if (isStem) "stem" else "step"})")
                 dfs(child, depth + 1)
             }
         }
@@ -72,7 +37,7 @@ class Trie(private val words: List<String>) : PredictiveTextEngine {
     override fun getPredictions(currentText: String): List<WordPrediction> {
         val prefix = currentText.trim()
         val results = mutableListOf<WordPrediction>()
-        for ((key, child) in root.children) {
+        for ((key, _) in root) {
             val (isStem, wordIndex) = key
             val word = words.getOrNull(wordIndex) ?: continue
             if (word.startsWith(prefix)) {
@@ -107,8 +72,8 @@ class Trie(private val words: List<String>) : PredictiveTextEngine {
             return trie
         }
 
-        private fun loadNode(root: TrieNode, input: InputStream) {
-            val stack = ArrayDeque<Pair<TrieNode, Int>>() // Stack of (node, layer)
+        private fun loadNode(root: MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>, input: InputStream) {
+            val stack = ArrayDeque<Pair<MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>, Int>>()
             stack.addLast(root to 1)
 
             while (stack.isNotEmpty()) {
@@ -131,8 +96,8 @@ class Trie(private val words: List<String>) : PredictiveTextEngine {
                 if (byte2 == -1 || byte3 == -1) break
 
                 val wordIndex = (high shl 16) or (byte2 shl 8) or byte3
-                val child = TrieNode()
-                current.children[Pair(isStem, wordIndex)] = child
+                val child = mutableMapOf<Pair<Boolean, Int>, MutableMap<*, *>>()
+                current[Pair(isStem, wordIndex)] = child
 
                 if (layer < 4) {
                     stack.addLast(child to (layer + 1))
