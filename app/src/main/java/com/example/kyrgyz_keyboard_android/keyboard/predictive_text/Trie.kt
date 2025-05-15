@@ -37,21 +37,6 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
     //     dfs(root)
     // }
 
-    fun readWordsFromBuffer(buffer: MappedByteBuffer, wordCount: Int) {
-        Log.d("PredictiveEngine", "Loading words...")
-        val zeroByte = 0.toByte()
-        for (i in 0 until wordCount) {
-            val sb = StringBuilder()
-            while (true) {
-                val b = buffer.get()
-                if (b == zeroByte) break
-                sb.append(BYTE_TO_CHAR[b])
-            }
-            words.add(sb.toString())
-        }
-        Log.d("PredictiveEngine", "Loaded ${words.size} words")
-    }
-
     fun getSimpleWordPredictions(currentText: String, maxResults: Int): List<String> {
         Log.d("Trie", "getPredictions: $currentText")
         val currentWords = currentText.split(" ")
@@ -71,59 +56,59 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
         return results
     }
 
-    companion object {
-        fun load(input: InputStream): Trie {
-            println("Trie loading...")
-            val countBytes = ByteArray(3)
-            input.read(countBytes)
-            val wordCount = (countBytes[0].toInt() and 0xFF shl 16) or
-                    (countBytes[1].toInt() and 0xFF shl 8) or
-                    (countBytes[2].toInt() and 0xFF)
-            val words = mutableListOf<String>()
-            repeat(wordCount) {
-                val sb = StringBuilder()
-                while (true) {
-                    val b = input.read().toByte()
-                    if (b == 0.toByte()) break
-                    sb.append(BYTE_TO_CHAR[b])
-                }
-                words.add(sb.toString())
+    fun load(input: MappedByteBuffer) {
+        Log.d("PredictiveEngine", "Trie loading...")
+        val zeroByte = 0.toByte()
+
+        val countBytes = ByteArray(3)
+        input.get(countBytes)
+        val wordCount = (countBytes[0].toInt() and 0xFF shl 16) or
+                (countBytes[1].toInt() and 0xFF shl 8) or
+                (countBytes[2].toInt() and 0xFF)
+        Log.d("PredictiveEngine", "Trie has $wordCount words")
+
+        repeat(wordCount) {
+            val sb = StringBuilder()
+            while (true) {
+                val b = input.get()
+                if (b == zeroByte) break
+                sb.append(BYTE_TO_CHAR[b])
             }
-            val trie = Trie(words)
-            println("Trie loaded with ${words.size} words")
-            loadNode(trie.root, input)
-            println("Trie loaded")
-            return trie
+            words.add(sb.toString())
         }
 
-        private fun loadNode(
-            root: MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>,
-            input: InputStream
-        ) {
-            val stack = ArrayDeque<Pair<MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>, Int>>()
-            stack.addLast(root to 1)
+        Log.d("PredictiveEngine", "Trie loaded ${words.size} words")
 
-            while (stack.isNotEmpty()) {
-                val (current, layer) = stack.last()
+        // loadNode(trie.root, input)
+    }
 
-                val byte1 = input.read()
-                if (byte1 == -1) break
+    private fun loadNode(
+        root: MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>,
+        input: InputStream
+    ) {
+        val stack = ArrayDeque<Pair<MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>, Int>>()
+        stack.addLast(root to 1)
 
-                if ((byte1 and RETURN_MARKER) != 0) {
-                    stack.removeLast()
-                    continue
-                }
+        while (stack.isNotEmpty()) {
+            val (current, layer) = stack.last()
 
-                val isStem = (byte1 and STEM_MARKER) != 0
-                val high = byte1 and STEM_MARKER.inv()
+            val byte1 = input.read()
+            if (byte1 == -1) break
 
-                val wordIndex = (high shl 16) or (input.read() shl 8) or input.read()
-                val child = mutableMapOf<Pair<Boolean, Int>, MutableMap<*, *>>()
-                current[Pair(isStem, wordIndex)] = child
+            if ((byte1 and RETURN_MARKER) != 0) {
+                stack.removeLast()
+                continue
+            }
 
-                if (layer < 4) {
-                    stack.addLast(child to (layer + 1))
-                }
+            val isStem = (byte1 and STEM_MARKER) != 0
+            val high = byte1 and STEM_MARKER.inv()
+
+            val wordIndex = (high shl 16) or (input.read() shl 8) or input.read()
+            val child = mutableMapOf<Pair<Boolean, Int>, MutableMap<*, *>>()
+            current[Pair(isStem, wordIndex)] = child
+
+            if (layer < 4) {
+                stack.addLast(child to (layer + 1))
             }
         }
     }

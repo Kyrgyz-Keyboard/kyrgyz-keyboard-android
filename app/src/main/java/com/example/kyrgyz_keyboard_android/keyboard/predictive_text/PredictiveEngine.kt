@@ -36,15 +36,7 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
             val trieFile = copyAssetToFile(context, "trie.bin", "trie_mapped.bin")
             val trieBuffer = mapFile(context, trieFile)
             try {
-                val countBytes = ByteArray(3)
-                trieBuffer.get(countBytes)
-                val wordCount = (countBytes[0].toInt() and 0xFF shl 16) or
-                        (countBytes[1].toInt() and 0xFF shl 8) or
-                        (countBytes[2].toInt() and 0xFF)
-
-                Log.d("PredictiveEngine", "Word count: $wordCount")
-                trie.readWordsFromBuffer(trieBuffer, wordCount)
-
+                trie.load(trieBuffer)
             } catch (e: Exception) {
                 Log.e("PredictiveEngine", "Failed to load trie", e)
             }
