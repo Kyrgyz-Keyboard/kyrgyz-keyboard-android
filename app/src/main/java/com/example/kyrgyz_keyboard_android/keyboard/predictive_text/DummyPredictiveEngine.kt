@@ -24,18 +24,16 @@ class DummyPredictiveEngine : PredictiveTextEngine {
         "менин" to listOf("атым", "үйүм", "жерим")
     )
 
-    override fun getPredictions(currentText: String): List<WordPrediction> {
+    override fun getPredictions(currentText: String): List<String> {
         val text = currentText.lowercase()
 
         // Exact match
-        wordDatabase[text]?.let { words ->
-            return words.map { WordPrediction(word = it, isStem = true) }
-        }
+        wordDatabase[text]
 
         // If no exact match, finds the key that matches our current text
         return wordDatabase.entries
             .firstOrNull { (key, _) -> key == text }
-            ?.value?.map { WordPrediction(word = it, isStem = true) }
+            ?.value
             ?: emptyList()
     }
 

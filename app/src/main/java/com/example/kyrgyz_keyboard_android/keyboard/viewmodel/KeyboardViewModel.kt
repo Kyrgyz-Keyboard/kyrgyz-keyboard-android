@@ -72,7 +72,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
 
             val currentState = _keyboardState.value
             val predictions = predictiveEngine.getPredictions(currentState.currentWord)
-            _suggestions.value = predictions.map { it.word }
+            _suggestions.value = predictions
         } catch (e: OutOfMemoryError) {
             _suggestions.value = emptyList()
         }

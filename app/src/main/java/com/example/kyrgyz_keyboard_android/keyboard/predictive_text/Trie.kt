@@ -1,6 +1,9 @@
 package com.example.kyrgyz_keyboard_android.keyboard.predictive_text
 
+import android.util.Log
 import java.io.InputStream
+import java.nio.MappedByteBuffer
+import java.util.Collections.synchronizedList
 
 const val RETURN_MARKER: Int = 1 shl 7
 const val STEM_MARKER: Int = 1 shl 6
@@ -15,36 +18,57 @@ val DECODING_TABLE = listOf(
 
 val BYTE_TO_CHAR = DECODING_TABLE.mapIndexed { index, c -> (index + 1).toByte() to c }.toMap()
 
-class Trie(private val words: List<String>) : PredictiveTextEngine {
+class Trie(private val words: MutableList<String> = synchronizedList(mutableListOf())) {
 
     private val root = mutableMapOf<Pair<Boolean, Int>, MutableMap<*, *>>()
-    private val reverseIndex = words.mapIndexed { i, w -> i to w }.toMap()
+    // private val reverseIndex = words.mapIndexed { i, w -> i to w }.toMap()
 
-    fun print() {
-        fun dfs(node: MutableMap<Pair<Boolean, Int>, *>, depth: Int = 0) {
-            for ((key, childAny) in node) {
-                @Suppress("UNCHECKED_CAST")
-                val child = childAny as? MutableMap<Pair<Boolean, Int>, *> ?: continue
-                val (isStem, index) = key
-                val word = reverseIndex[index] ?: "<?>"
-                println("  ".repeat(depth) + "- $word (${if (isStem) "stem" else "step"})")
-                dfs(child, depth + 1)
+    // fun print() {
+    //     fun dfs(node: MutableMap<Pair<Boolean, Int>, *>, depth: Int = 0) {
+    //         for ((key, childAny) in node) {
+    //             @Suppress("UNCHECKED_CAST")
+    //             val child = childAny as? MutableMap<Pair<Boolean, Int>, *> ?: continue
+    //             val (isStem, index) = key
+    //             val word = reverseIndex[index] ?: "<?>"
+    //             println("  ".repeat(depth) + "- $word (${if (isStem) "stem" else "step"})")
+    //             dfs(child, depth + 1)
+    //         }
+    //     }
+    //     dfs(root)
+    // }
+
+    fun readWordsFromBuffer(buffer: MappedByteBuffer, wordCount: Int) {
+        Log.d("PredictiveEngine", "Loading words...")
+        val zeroByte = 0.toByte()
+        for (i in 0 until wordCount) {
+            val sb = StringBuilder()
+            while (true) {
+                val b = buffer.get()
+                if (b == zeroByte) break
+                sb.append(BYTE_TO_CHAR[b])
             }
+            words.add(sb.toString())
         }
-        dfs(root)
+        Log.d("PredictiveEngine", "Loaded ${words.size} words")
     }
 
-    override fun getPredictions(currentText: String): List<WordPrediction> {
-        val prefix = currentText.trim()
-        val results = mutableListOf<WordPrediction>()
-        for ((key, _) in root) {
-            val (isStem, wordIndex) = key
-            val word = words.getOrNull(wordIndex) ?: continue
-            if (word.startsWith(prefix)) {
-                results.add(WordPrediction(word, isStem))
+    fun getSimpleWordPredictions(currentText: String, maxResults: Int): List<String> {
+        Log.d("Trie", "getPredictions: $currentText")
+        val currentWords = currentText.split(" ")
+        if (currentWords.isEmpty()) return emptyList()
+
+        val results = mutableListOf<String>()
+        synchronized(words) {
+            for (word in words) {
+                if (word.startsWith(currentWords.last())) {
+                    results.add(word)
+                    if (results.size >= maxResults) {
+                        break
+                    }
+                }
             }
         }
-        return results.take(5)
+        return results
     }
 
     companion object {
@@ -61,7 +85,7 @@ class Trie(private val words: List<String>) : PredictiveTextEngine {
                 while (true) {
                     val b = input.read().toByte()
                     if (b == 0.toByte()) break
-                    sb.append(BYTE_TO_CHAR[b] ?: '?')
+                    sb.append(BYTE_TO_CHAR[b])
                 }
                 words.add(sb.toString())
             }
@@ -72,7 +96,10 @@ class Trie(private val words: List<String>) : PredictiveTextEngine {
             return trie
         }
 
-        private fun loadNode(root: MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>, input: InputStream) {
+        private fun loadNode(
+            root: MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>,
+            input: InputStream
+        ) {
             val stack = ArrayDeque<Pair<MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>, Int>>()
             stack.addLast(root to 1)
 
@@ -81,21 +108,16 @@ class Trie(private val words: List<String>) : PredictiveTextEngine {
 
                 val byte1 = input.read()
                 if (byte1 == -1) break
-                val b = byte1.toByte()
 
-                if ((b.toInt() and RETURN_MARKER) != 0) {
+                if ((byte1 and RETURN_MARKER) != 0) {
                     stack.removeLast()
                     continue
                 }
 
-                val isStem = (b.toInt() and STEM_MARKER) != 0
-                val high = b.toInt() and STEM_MARKER.inv()
+                val isStem = (byte1 and STEM_MARKER) != 0
+                val high = byte1 and STEM_MARKER.inv()
 
-                val byte2 = input.read()
-                val byte3 = input.read()
-                if (byte2 == -1 || byte3 == -1) break
-
-                val wordIndex = (high shl 16) or (byte2 shl 8) or byte3
+                val wordIndex = (high shl 16) or (input.read() shl 8) or input.read()
                 val child = mutableMapOf<Pair<Boolean, Int>, MutableMap<*, *>>()
                 current[Pair(isStem, wordIndex)] = child
 

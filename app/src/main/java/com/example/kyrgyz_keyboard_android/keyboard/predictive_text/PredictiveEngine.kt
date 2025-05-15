@@ -8,11 +8,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.apertium.lttoolbox.process.FSTProcessor
 import java.io.StringReader
-import java.nio.MappedByteBuffer
 
 class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
     private val fstp = FSTProcessor()
-    private var trie: PredictiveTextEngine = Trie(emptyList())
+    private var trie = Trie()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     @Volatile
@@ -44,12 +43,10 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
                         (countBytes[2].toInt() and 0xFF)
 
                 Log.d("PredictiveEngine", "Word count: $wordCount")
+                trie.readWordsFromBuffer(trieBuffer, wordCount)
 
-                val words = readWordsFromBuffer(trieBuffer, wordCount)
-                trie = MappedTrie(words, trieBuffer)
             } catch (e: Exception) {
                 Log.e("PredictiveEngine", "Failed to load trie", e)
-                trie = Trie(emptyList())
             }
 
             val maxMemory = Runtime.getRuntime().maxMemory()
@@ -60,21 +57,6 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
             Log.d("PredictiveEngine", "Allocated: ${allocatedMemory / 1024 / 1024} MB")
             Log.d("PredictiveEngine", "Free: ${freeMemory / 1024 / 1024} MB")
         }
-    }
-
-    private fun readWordsFromBuffer(buffer: MappedByteBuffer, wordCount: Int): List<String> {
-        val words = mutableListOf<String>()
-        for (i in 0 until wordCount) {
-            val sb = StringBuilder()
-            while (true) {
-                if (!buffer.hasRemaining()) break
-                val b = buffer.get()
-                if (b == 0.toByte()) break
-                sb.append(BYTE_TO_CHAR[b] ?: '?')
-            }
-            words.add(sb.toString())
-        }
-        return words
     }
 
     fun isReady(): Boolean = ready
@@ -101,14 +83,8 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
             .minOrNull() ?: word
     }
 
-    override fun getPredictions(currentText: String): List<WordPrediction> = try {
-        if (currentText.isEmpty()) {
-            emptyList()
-        } else {
-            val predictions = trie.getPredictions(currentText)
-            predictions
-                .take(MAX_SUGGESTIONS)
-        }
+    override fun getPredictions(currentText: String): List<String> = try {
+        trie.getSimpleWordPredictions(currentText, MAX_SUGGESTIONS)
     } catch (e: Exception) {
         Log.e("PredictiveEngine", "Error getting predictions for: $currentText", e)
         emptyList()
