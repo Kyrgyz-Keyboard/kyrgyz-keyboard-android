@@ -26,12 +26,16 @@ import com.example.kyrgyz_keyboard_android.ui.keyboard.utils.KeyboardConstants
 import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions
 import com.example.kyrgyz_keyboard_android.ui.theme.EnterColor
 import com.example.kyrgyz_keyboard_android.ui.theme.EnterColorDark
+import com.example.kyrgyz_keyboard_android.ui.theme.EnterTapBackgroundColor
+import com.example.kyrgyz_keyboard_android.ui.theme.EnterTapBackgroundColorDark
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyBackgroundColor
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyBackgroundColorDark
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyGray
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyGrayDark
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyLockedBackgroundColor
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyLockedBackgroundColorDark
+import com.example.kyrgyz_keyboard_android.ui.theme.KeyTapBackgroundColor
+import com.example.kyrgyz_keyboard_android.ui.theme.KeyTapBackgroundColorDark
 import kotlinx.coroutines.delay
 
 @Composable
@@ -46,6 +50,7 @@ fun KeyButton(
     var isBackspacePressed by remember { mutableStateOf(false) }
     var firstTapTime by remember { mutableLongStateOf(0L) }
     var waitingForSecondTap by remember { mutableStateOf(false) }
+    var isKeyPressed by remember { mutableStateOf(false) }
 
     val transformedKey = remember(key, keyboardState.isDarkMode) {
         if (key.ch == KeyboardConstants.LIGHT || key.ch == KeyboardConstants.DARK) {
@@ -76,15 +81,24 @@ fun KeyButton(
         }
     }
 
+    LaunchedEffect(isKeyPressed) {
+        if (isKeyPressed) {
+            delay(30)
+            isKeyPressed = false
+        }
+    }
+
     Box(
         modifier = modifier
             .background(
-                color = getBackgroundColor(key, keyboardState.isDarkMode),
+                color = getBackgroundColor(key, keyboardState.isDarkMode, isKeyPressed),
                 shape = RoundedCornerShape(Dimensions.keyCornerRadius)
             )
             .pointerInput(key, capsLockEnabled) {
                 detectTapGestures(
                     onPress = {
+                        isKeyPressed = true
+                        
                         when {
                             key.img == R.drawable.ic_remove -> {
                                 isBackspacePressed = true
@@ -113,11 +127,9 @@ fun KeyButton(
                         if (key.img == R.drawable.ic_caps) {
                             val currentTime = System.currentTimeMillis()
                             if (waitingForSecondTap && currentTime - firstTapTime < 300) {
-                                // Double tap detected
                                 viewModel.updateCapsLockState(CapsLockState.LOCKED)
                                 waitingForSecondTap = false
                             } else {
-                                // First tap
                                 firstTapTime = currentTime
                                 waitingForSecondTap = true
                                 viewModel.updateCapsLockState(
@@ -125,22 +137,6 @@ fun KeyButton(
                                     else CapsLockState.OFF
                                 )
                             }
-                        }
-                    },
-//                    onDoubleTap = {
-//                        if (key.img == R.drawable.ic_caps) {
-//                            viewModel.updateCapsLockState(
-//                                if (capsLockEnabled != CapsLockState.LOCKED) CapsLockState.LOCKED
-//                                else CapsLockState.OFF
-//                            )
-//                        }
-//                    },
-                    onLongPress = {
-                        if (key.img == R.drawable.ic_caps) {
-                            viewModel.updateCapsLockState(
-                                if (capsLockEnabled != CapsLockState.LOCKED) CapsLockState.LOCKED
-                                else CapsLockState.OFF
-                            )
                         }
                     }
                 )
@@ -151,7 +147,11 @@ fun KeyButton(
     }
 }
 
-private fun getBackgroundColor(key: KeyUiModel, isDarkMode: Boolean): Color = when {
+private fun getBackgroundColor(key: KeyUiModel, isDarkMode: Boolean, isPressed: Boolean = false): Color = when {
+    (isPressed && key.img != R.drawable.ic_enter) || key.isActive == CapsLockState.TEMPORARY ->
+        if (isDarkMode) KeyTapBackgroundColorDark else KeyTapBackgroundColor
+    isPressed && key.img == R.drawable.ic_enter ->
+        if (isDarkMode) EnterTapBackgroundColorDark else EnterTapBackgroundColor
     key.isActive == CapsLockState.LOCKED ->
         if (isDarkMode) KeyLockedBackgroundColorDark else KeyLockedBackgroundColor
     key.isSpecial && key.img != R.drawable.ic_enter ->
