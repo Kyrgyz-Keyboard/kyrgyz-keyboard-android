@@ -52,7 +52,7 @@ val DECODING_TABLE = listOf(
 
 val BYTE_TO_CHAR = DECODING_TABLE.mapIndexed { index, c -> (index + 1).toByte() to c }.toMap()
 
-class Trie(private val words: List<String>): PredictiveTextEngine {
+class Trie(private val words: List<String>) : PredictiveTextEngine {
 
     private val root = TrieNode()
     private val reverseIndex = words.mapIndexed { i, w -> i to w }.toMap()
