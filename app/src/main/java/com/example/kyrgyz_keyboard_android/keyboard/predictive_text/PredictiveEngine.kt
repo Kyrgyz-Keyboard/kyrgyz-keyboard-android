@@ -28,17 +28,15 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
                 "kir.automorf_mapped.bin"
             )
             val kirAutomorfbuffer = mapFile(context, kirAutomorfFile)
-
             fstp.load(kirAutomorfbuffer, "kir.automorf_mapped.bin")
             fstp.initAnalysis()
             if (!fstp.valid()) {
                 throw RuntimeException("Validity test for FSTProcessor failed")
             }
 
+            val trieFile = copyAssetToFile(context, "trie.bin", "trie_mapped.bin")
+            val trieBuffer = mapFile(context, trieFile)
             try {
-                val trieFile = copyAssetToFile(context, "trie.bin", "trie_mapped.bin")
-                val trieBuffer = mapFile(context, trieFile)
-
                 val countBytes = ByteArray(3)
                 trieBuffer.get(countBytes)
                 val wordCount = (countBytes[0].toInt() and 0xFF shl 16) or
@@ -50,7 +48,7 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
                 val words = readWordsFromBuffer(trieBuffer, wordCount)
                 trie = MappedTrie(words, trieBuffer)
             } catch (e: Exception) {
-                Log.e("PredictiveEngine", "Failed to load mapped trie", e)
+                Log.e("PredictiveEngine", "Failed to load trie", e)
                 trie = Trie(emptyList())
             }
 
