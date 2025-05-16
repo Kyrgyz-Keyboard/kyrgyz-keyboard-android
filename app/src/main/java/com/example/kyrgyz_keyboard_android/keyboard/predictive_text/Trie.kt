@@ -18,12 +18,11 @@ val DECODING_TABLE = listOf(
 val BYTE_TO_CHAR = DECODING_TABLE.mapIndexed { index, c -> (index + 1).toByte() to c }.toMap()
 
 class Trie(private val words: MutableList<String> = synchronizedList(mutableListOf())) {
-
     companion object {
         private const val MAX_LAYERS = 4
     }
 
-    private val root = mutableMapOf<Pair<Boolean, Int>, MutableMap<*, *>>()
+    private val data = mutableMapOf<Pair<Boolean, Int>, MutableMap<*, *>>()
     // private val reverseIndex = words.mapIndexed { i, w -> i to w }.toMap()
 
     // fun print() {
@@ -37,7 +36,7 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
     //             dfs(child, depth + 1)
     //         }
     //     }
-    //     dfs(root)
+    //     dfs(data)
     // }
 
     private fun printMemoryUsage() {
@@ -45,14 +44,17 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
         val allocatedMemory = Runtime.getRuntime().totalMemory()
         val freeMemory = Runtime.getRuntime().freeMemory()
 
-        Log.d("PredictiveEngine", "Max memory: ${maxMemory / 1024 / 1024} MB")
-        Log.d("PredictiveEngine", "Allocated: ${allocatedMemory / 1024 / 1024} MB")
-        Log.d("PredictiveEngine", "Free: ${freeMemory / 1024 / 1024} MB")
+        Log.d(
+            "PredictiveEngine",
+            "Memory stats:" +
+                    "Max: ${maxMemory / 1024 / 1024} MB | " +
+                    "Allocated: ${allocatedMemory / 1024 / 1024} MB | " +
+                    "Free: ${freeMemory / 1024 / 1024} MB"
+        )
     }
 
     fun getSimpleWordPredictions(currentText: String, maxResults: Int): List<String> {
-        Log.d("Trie", "getPredictions: $currentText")
-        val currentWords = currentText.split(" ")
+        val currentWords = currentText.split(' ').filter { it.isNotBlank() }
         if (currentWords.isEmpty()) return emptyList()
 
         val results = mutableListOf<String>()
@@ -66,6 +68,7 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
                 }
             }
         }
+        Log.d("PredictiveEngine", "Simple Word Prediction: $currentText -> $results")
         return results
     }
 
@@ -102,14 +105,17 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
         Log.d("PredictiveEngine", "Trie is loading tree...")
         try {
             val stack = ArrayDeque<Pair<MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>, Int>>()
-            stack.addLast(root to 1)
+            stack.addLast(data to 1)
 
             // while (stack.isNotEmpty()) {
             //     val (current, layer) = stack.last()
             //
-            //     if (!input.hasRemaining()) break
-            //     val byte1 = input.get().toInt()
+            //     if (layer == 1 && data.size % 100 == 0) {
+            //         Log.d("PredictiveEngine", "Words on layer 1: ${data.size}")
+            //         printMemoryUsage()
+            //     }
             //
+            //     val byte1 = input.get().toInt()
             //     if ((byte1 and RETURN_MARKER) != 0) {
             //         stack.removeLast()
             //         continue

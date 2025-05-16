@@ -29,7 +29,7 @@ fun SuggestionsRow(
     suggestions: List<String>,
     viewModel: KeyboardViewModel,
     modifier: Modifier = Modifier,
-    isMidWord: Boolean = false
+    // isMidWord: Boolean = false
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()

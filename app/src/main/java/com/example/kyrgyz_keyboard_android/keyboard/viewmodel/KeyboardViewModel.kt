@@ -12,19 +12,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class KeyboardViewModel(application: Application) : AndroidViewModel(application) {
-    private var predictiveEngine: PredictiveTextEngineImpl? = null
+    private var predictiveEngine = PredictiveTextEngineImpl(application)
     private val _keyboardState = MutableStateFlow(KeyboardState())
     val keyboardState: StateFlow<KeyboardState> = _keyboardState.asStateFlow()
 
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
     val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            predictiveEngine = PredictiveTextEngineImpl(application)
-            updateSuggestions()
-        }
-    }
+    // init {
+    //     updateSuggestions()
+    // }
 
     fun toggleKeyboardMode() = viewModelScope.launch {
         _keyboardState.update { it.copy(isSymbolsMode = !it.isSymbolsMode) }
@@ -66,13 +63,12 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     private fun updateSuggestions() = viewModelScope.launch {
         try {
             repeat(10) {
-                if (predictiveEngine?.isReady() == true) return@repeat
+                if (predictiveEngine.isReady()) return@repeat
                 kotlinx.coroutines.delay(50)
             }
 
             val currentState = _keyboardState.value
-            _suggestions.value =
-                predictiveEngine?.getPredictions(currentState.currentWord) ?: emptyList()
+            _suggestions.value = predictiveEngine.getPredictions(currentState.currentWord)
         } catch (e: OutOfMemoryError) {
             _suggestions.value = emptyList()
         }
@@ -92,7 +88,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
                 state.copy(
                     currentWord = state.currentWord.dropLast(1),
                     inputBuffer = state.inputBuffer.dropLast(1),
-                    isMidWord = state.currentWord.length > 1
+                    // isMidWord = state.currentWord.length > 1
                 )
             } else state
         }
@@ -104,7 +100,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             state.copy(
                 inputBuffer = state.inputBuffer.dropLast(state.currentWord.length) + suggestion,
                 currentWord = "",
-                isMidWord = false
+                // isMidWord = false
             )
         }
         updateSuggestions()
@@ -124,7 +120,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             state.copy(
                 currentWord = state.currentWord + text,
                 inputBuffer = state.inputBuffer + text,
-                isMidWord = true
+                // isMidWord = true
             )
         }
         updateSuggestions()
@@ -133,7 +129,10 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     private fun completeCurrentWord() {
         _keyboardState.update { state ->
             if (state.currentWord.isNotEmpty()) {
-                state.copy(currentWord = "", isMidWord = false)
+                state.copy(
+                    currentWord = "",
+                    // isMidWord = false
+                )
             } else state
         }
         updateSuggestions()
@@ -148,7 +147,7 @@ data class KeyboardState(
     val capsLockState: CapsLockState = CapsLockState.OFF,
     val currentWord: String = "",
     val inputBuffer: String = "",
-    val isMidWord: Boolean = false,
+    // val isMidWord: Boolean = false,
     val isSymbolsMode: Boolean = false,
     val isSymbolsLayout2: Boolean = false,
     val isLatinLayout: Boolean = false,
