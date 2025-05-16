@@ -1,7 +1,6 @@
 package com.example.kyrgyz_keyboard_android.keyboard.predictive_text
 
 import android.util.Log
-import java.io.InputStream
 import java.nio.MappedByteBuffer
 import java.util.Collections.synchronizedList
 
@@ -20,6 +19,10 @@ val BYTE_TO_CHAR = DECODING_TABLE.mapIndexed { index, c -> (index + 1).toByte() 
 
 class Trie(private val words: MutableList<String> = synchronizedList(mutableListOf())) {
 
+    companion object {
+        private const val MAX_LAYERS = 4
+    }
+
     private val root = mutableMapOf<Pair<Boolean, Int>, MutableMap<*, *>>()
     // private val reverseIndex = words.mapIndexed { i, w -> i to w }.toMap()
 
@@ -36,6 +39,16 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
     //     }
     //     dfs(root)
     // }
+
+    private fun printMemoryUsage() {
+        val maxMemory = Runtime.getRuntime().maxMemory()
+        val allocatedMemory = Runtime.getRuntime().totalMemory()
+        val freeMemory = Runtime.getRuntime().freeMemory()
+
+        Log.d("PredictiveEngine", "Max memory: ${maxMemory / 1024 / 1024} MB")
+        Log.d("PredictiveEngine", "Allocated: ${allocatedMemory / 1024 / 1024} MB")
+        Log.d("PredictiveEngine", "Free: ${freeMemory / 1024 / 1024} MB")
+    }
 
     fun getSimpleWordPredictions(currentText: String, maxResults: Int): List<String> {
         Log.d("Trie", "getPredictions: $currentText")
@@ -56,18 +69,9 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
         return results
     }
 
-    fun load(input: MappedByteBuffer) {
-        Log.d("PredictiveEngine", "Trie loading...")
+    private fun loadWords(count: Int, input: MappedByteBuffer) {
         val zeroByte = 0.toByte()
-
-        val countBytes = ByteArray(3)
-        input.get(countBytes)
-        val wordCount = (countBytes[0].toInt() and 0xFF shl 16) or
-                (countBytes[1].toInt() and 0xFF shl 8) or
-                (countBytes[2].toInt() and 0xFF)
-        Log.d("PredictiveEngine", "Trie has $wordCount words")
-
-        repeat(wordCount) {
+        repeat(count) {
             val sb = StringBuilder()
             while (true) {
                 val b = input.get()
@@ -76,40 +80,60 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
             }
             words.add(sb.toString())
         }
-
-        Log.d("PredictiveEngine", "Trie loaded ${words.size} words")
-
-        // loadNode(trie.root, input)
     }
 
-    private fun loadNode(
-        root: MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>,
-        input: InputStream
-    ) {
-        val stack = ArrayDeque<Pair<MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>, Int>>()
-        stack.addLast(root to 1)
+    fun load(input: MappedByteBuffer, onPreReady: (() -> Unit)? = null) {
+        Log.d("PredictiveEngine", "Trie loading...")
 
-        while (stack.isNotEmpty()) {
-            val (current, layer) = stack.last()
+        val countBytes = ByteArray(3)
+        input.get(countBytes)
+        val wordCount = (countBytes[0].toInt() and 0xFF shl 16) or
+                (countBytes[1].toInt() and 0xFF shl 8) or
+                (countBytes[2].toInt() and 0xFF)
+        Log.d("PredictiveEngine", "Trie has $wordCount words")
 
-            val byte1 = input.read()
-            if (byte1 == -1) break
+        loadWords(100_000, input)
+        onPreReady?.invoke()
+        loadWords(wordCount - 100_000, input)
+        Log.d("PredictiveEngine", "Trie loaded ${words.size} words")
 
-            if ((byte1 and RETURN_MARKER) != 0) {
-                stack.removeLast()
-                continue
-            }
+        printMemoryUsage()
 
-            val isStem = (byte1 and STEM_MARKER) != 0
-            val high = byte1 and STEM_MARKER.inv()
+        Log.d("PredictiveEngine", "Trie is loading tree...")
+        try {
+            val stack = ArrayDeque<Pair<MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>, Int>>()
+            stack.addLast(root to 1)
 
-            val wordIndex = (high shl 16) or (input.read() shl 8) or input.read()
-            val child = mutableMapOf<Pair<Boolean, Int>, MutableMap<*, *>>()
-            current[Pair(isStem, wordIndex)] = child
+            // while (stack.isNotEmpty()) {
+            //     val (current, layer) = stack.last()
+            //
+            //     if (!input.hasRemaining()) break
+            //     val byte1 = input.get().toInt()
+            //
+            //     if ((byte1 and RETURN_MARKER) != 0) {
+            //         stack.removeLast()
+            //         continue
+            //     }
+            //
+            //     val isStem = (byte1 and STEM_MARKER) != 0
+            //     val high = byte1 and STEM_MARKER.inv()
+            //
+            //     val wordIndex = (high shl 16) or (input.get().toInt() shl 8) or input.get().toInt()
+            //     val child = mutableMapOf<Pair<Boolean, Int>, MutableMap<*, *>>()
+            //     current[Pair(isStem, wordIndex)] = child
+            //
+            //     if (layer < MAX_LAYERS) {
+            //         stack.addLast(child to (layer + 1))
+            //     }
+            // }
+            // Log.d("PredictiveEngine", "Trie load finished")
 
-            if (layer < 4) {
-                stack.addLast(child to (layer + 1))
-            }
+        } catch (e: java.lang.OutOfMemoryError) {
+            Log.e("PredictiveEngine", "Trie load failed: OutOfMemoryError", e)
+        } catch (e: Exception) {
+            Log.e("PredictiveEngine", "Trie load failed", e)
         }
+
+        printMemoryUsage()
     }
 }

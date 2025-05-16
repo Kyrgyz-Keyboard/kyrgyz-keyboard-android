@@ -19,8 +19,6 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
 
     init {
         scope.launch {
-            ready = true
-
             val kirAutomorfFile = copyAssetToFile(
                 context,
                 "kir.automorf.bin",
@@ -36,18 +34,12 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
             val trieFile = copyAssetToFile(context, "trie.bin", "trie_mapped.bin")
             val trieBuffer = mapFile(context, trieFile)
             try {
-                trie.load(trieBuffer)
+                trie.load(trieBuffer) {
+                    ready = true
+                }
             } catch (e: Exception) {
                 Log.e("PredictiveEngine", "Failed to load trie", e)
             }
-
-            val maxMemory = Runtime.getRuntime().maxMemory()
-            val allocatedMemory = Runtime.getRuntime().totalMemory()
-            val freeMemory = Runtime.getRuntime().freeMemory()
-
-            Log.d("PredictiveEngine", "Max memory: ${maxMemory / 1024 / 1024} MB")
-            Log.d("PredictiveEngine", "Allocated: ${allocatedMemory / 1024 / 1024} MB")
-            Log.d("PredictiveEngine", "Free: ${freeMemory / 1024 / 1024} MB")
         }
     }
 
