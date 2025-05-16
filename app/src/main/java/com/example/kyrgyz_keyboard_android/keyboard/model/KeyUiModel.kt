@@ -6,6 +6,6 @@ data class KeyUiModel(
     val hint: String? = null,
     val img: Int? = null,
     val weight: Float = 1f,
-    var isActive: CapsLockState = CapsLockState.OFF
+    var isActive: CapsLockState = CapsLockState.TEMPORARY
 )
 

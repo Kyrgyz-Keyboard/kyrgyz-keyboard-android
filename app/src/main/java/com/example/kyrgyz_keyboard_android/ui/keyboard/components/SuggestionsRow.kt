@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.example.kyrgyz_keyboard_android.keyboard.input.handleSuggestionClick
+import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import com.example.kyrgyz_keyboard_android.keyboard.viewmodel.KeyboardViewModel
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyboardGray
 import com.example.kyrgyz_keyboard_android.ui.theme.keyboardTextStyle
@@ -29,7 +30,6 @@ fun SuggestionsRow(
     suggestions: List<String>,
     viewModel: KeyboardViewModel,
     modifier: Modifier = Modifier,
-    // isMidWord: Boolean = false
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -42,11 +42,27 @@ fun SuggestionsRow(
             .horizontalScroll(scrollState),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
+
+        val capsLockEnabled = keyboardState.capsLockState
+
+        val shouldCapitalize = keyboardState.currentWord.isNotEmpty() &&
+                keyboardState.currentWord.first().isUpperCase() && capsLockEnabled != CapsLockState.LOCKED
+
         suggestions.forEach { suggestion ->
+            val text = when {
+                shouldCapitalize || capsLockEnabled == CapsLockState.TEMPORARY ->
+                    suggestion.replaceFirstChar { it.uppercase() }
+                capsLockEnabled == CapsLockState.LOCKED ->
+                    suggestion.uppercase()
+                else ->
+                    suggestion.lowercase()
+            }
+            
             SuggestionChip(
-                text = suggestion, isDarkMode = keyboardState.isDarkMode, onClick = {
-                    handleSuggestionClick(suggestion, context, viewModel)
-                })
+                text = text,
+                isDarkMode = keyboardState.isDarkMode, 
+                onClick = { handleSuggestionClick(text, context, viewModel) }
+            )
         }
     }
 }

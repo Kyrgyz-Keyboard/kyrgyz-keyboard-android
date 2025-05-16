@@ -68,7 +68,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             }
 
             val currentState = _keyboardState.value
-            _suggestions.value = predictiveEngine.getPredictions(currentState.currentWord)
+            _suggestions.value = predictiveEngine.getPredictions(currentState.currentWord.lowercase())
         } catch (e: OutOfMemoryError) {
             _suggestions.value = emptyList()
         }
@@ -88,7 +88,6 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
                 state.copy(
                     currentWord = state.currentWord.dropLast(1),
                     inputBuffer = state.inputBuffer.dropLast(1),
-                    // isMidWord = state.currentWord.length > 1
                 )
             } else state
         }
@@ -100,7 +99,6 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             state.copy(
                 inputBuffer = state.inputBuffer.dropLast(state.currentWord.length) + suggestion,
                 currentWord = "",
-                // isMidWord = false
             )
         }
         updateSuggestions()

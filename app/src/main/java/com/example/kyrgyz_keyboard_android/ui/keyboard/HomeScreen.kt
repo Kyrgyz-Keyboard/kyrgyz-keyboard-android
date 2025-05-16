@@ -41,7 +41,6 @@ fun HomeScreen(viewModel: KeyboardViewModel = viewModel()) {
         SuggestionsRow(
             suggestions = suggestions,
             viewModel = viewModel,
-            // isMidWord = keyboardState.isMidWord
         )
 
         when {

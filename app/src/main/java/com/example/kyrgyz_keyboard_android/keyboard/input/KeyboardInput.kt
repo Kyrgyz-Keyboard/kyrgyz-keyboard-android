@@ -62,6 +62,20 @@ fun handleSuggestionClick(
         inputConnection.deleteSurroundingText(keyboardState.currentWord.length, 0)
     }
 
-    inputConnection.commitText("$suggestion ", 1)
+    val capsLockEnabled = keyboardState.capsLockState
+
+    val shouldCapitalize = keyboardState.currentWord.isNotEmpty() &&
+            keyboardState.currentWord.first().isUpperCase() && capsLockEnabled != CapsLockState.LOCKED
+
+    val text = when {
+        shouldCapitalize || capsLockEnabled == CapsLockState.TEMPORARY -> 
+            suggestion.replaceFirstChar { it.uppercase() }
+        capsLockEnabled == CapsLockState.LOCKED -> 
+            suggestion.uppercase()
+        else -> 
+            suggestion.lowercase()
+    }
+    
+    inputConnection.commitText("$text ", 1)
     viewModel.onSuggestionSelected(suggestion)
 }
