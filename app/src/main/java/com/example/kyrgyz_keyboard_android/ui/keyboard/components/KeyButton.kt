@@ -83,7 +83,7 @@ fun KeyButton(
 
     LaunchedEffect(isKeyPressed) {
         if (isKeyPressed) {
-            delay(30)
+            delay(10)
             isKeyPressed = false
         }
     }
@@ -148,7 +148,9 @@ fun KeyButton(
 }
 
 private fun getBackgroundColor(key: KeyUiModel, isDarkMode: Boolean, isPressed: Boolean = false): Color = when {
-    key.isActive == CapsLockState.TEMPORARY ->
+    key.img == R.drawable.ic_caps && key.isActive == CapsLockState.TEMPORARY ->
+        if (isDarkMode) KeyTapBackgroundColorDark else KeyTapBackgroundColor
+    isPressed && key.isActive == CapsLockState.TEMPORARY ->
         if (isDarkMode) KeyTapBackgroundColorDark else KeyTapBackgroundColor
     isPressed && key.img != R.drawable.ic_enter && key.img != R.drawable.ic_caps ->
         if (isDarkMode) KeyTapBackgroundColorDark else KeyTapBackgroundColor

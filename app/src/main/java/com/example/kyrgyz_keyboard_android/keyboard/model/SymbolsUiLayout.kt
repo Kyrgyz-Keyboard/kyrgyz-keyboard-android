@@ -27,9 +27,10 @@ object SymbolsLayout1 {
 
     val symbolsRow4 = listOf(
         KeyUiModel(isSpecial = true, ch = "=\\<", weight = 1.4f),
+        KeyUiModel(ch = "!"),
         KeyUiModel(ch = "*"), KeyUiModel(ch = "\""), KeyUiModel(ch = "'"),
         KeyUiModel(ch = ":"), KeyUiModel(ch = ";"),
-        KeyUiModel(ch = "!"), KeyUiModel(ch = "?"),
+        KeyUiModel(ch = "?"),
         KeyUiModel(isSpecial = true, img = R.drawable.ic_remove, weight = 1.4f)
     )
 

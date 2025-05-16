@@ -19,9 +19,9 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
     val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
 
-    // init {
-    //     updateSuggestions()
-    // }
+     init {
+         updateSuggestions()
+     }
 
     fun toggleKeyboardMode() = viewModelScope.launch {
         _keyboardState.update { it.copy(isSymbolsMode = !it.isSymbolsMode) }
@@ -108,7 +108,16 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
 
     private fun handleSpace() {
         completeCurrentWord()
-        _keyboardState.update { it.copy(inputBuffer = it.inputBuffer + " ") }
+        _keyboardState.update { state ->
+            val lastChar = state.inputBuffer.lastOrNull()
+            val shouldCapitalize = lastChar == '.' || lastChar == '!' || lastChar == '?'
+            
+            if (shouldCapitalize) {
+                updateCapsLockState(CapsLockState.TEMPORARY)
+            }
+            
+            state.copy(inputBuffer = state.inputBuffer + " ")
+        }
     }
 
     private fun handleNewline() {
@@ -120,7 +129,6 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             state.copy(
                 currentWord = state.currentWord + text,
                 inputBuffer = state.inputBuffer + text,
-                // isMidWord = true
             )
         }
         updateSuggestions()
@@ -131,7 +139,6 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             if (state.currentWord.isNotEmpty()) {
                 state.copy(
                     currentWord = "",
-                    // isMidWord = false
                 )
             } else state
         }
@@ -153,10 +160,9 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
 }
 
 data class KeyboardState(
-    val capsLockState: CapsLockState = CapsLockState.OFF,
+    val capsLockState: CapsLockState = CapsLockState.TEMPORARY,
     val currentWord: String = "",
     val inputBuffer: String = "",
-    // val isMidWord: Boolean = false,
     val isSymbolsMode: Boolean = false,
     val isSymbolsLayout2: Boolean = false,
     val isLatinLayout: Boolean = false,

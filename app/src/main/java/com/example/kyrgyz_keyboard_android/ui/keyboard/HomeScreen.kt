@@ -70,13 +70,13 @@ private fun SymbolsLayout(viewModel: KeyboardViewModel) {
     val keyboardState by viewModel.keyboardState.collectAsState()
 
     KeyboardBase(viewModel) {
-        KeyboardRow(keys = SymbolsLayout1.symbolsRow1, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
-        KeyboardRow(keys = SymbolsLayout1.symbolsRow2, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
-        KeyboardRow(keys = SymbolsLayout1.symbolsRow3, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
-        KeyboardRow(keys = SymbolsLayout1.symbolsRow4, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout1.symbolsRow1, capsLockEnabled = CapsLockState.TEMPORARY, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout1.symbolsRow2, capsLockEnabled = CapsLockState.TEMPORARY, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout1.symbolsRow3, capsLockEnabled = CapsLockState.TEMPORARY, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout1.symbolsRow4, capsLockEnabled = CapsLockState.TEMPORARY, viewModel = viewModel)
         KeyboardRow(
             keys = SymbolsLayout1.getSymbolsRow5(keyboardState.isLatinLayout),
-            capsLockEnabled = CapsLockState.OFF,
+            capsLockEnabled = CapsLockState.TEMPORARY,
             viewModel = viewModel
         )
     }
@@ -87,13 +87,13 @@ private fun SymbolsLayout2(viewModel: KeyboardViewModel) {
     val keyboardState by viewModel.keyboardState.collectAsState()
 
     KeyboardBase(viewModel) {
-        KeyboardRow(keys = SymbolsLayout2.symbolsRow1, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
-        KeyboardRow(keys = SymbolsLayout2.symbolsRow2, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
-        KeyboardRow(keys = SymbolsLayout2.symbolsRow3, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
-        KeyboardRow(keys = SymbolsLayout2.symbolsRow4, capsLockEnabled = CapsLockState.OFF, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout2.symbolsRow1, capsLockEnabled = CapsLockState.TEMPORARY, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout2.symbolsRow2, capsLockEnabled = CapsLockState.TEMPORARY, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout2.symbolsRow3, capsLockEnabled = CapsLockState.TEMPORARY, viewModel = viewModel)
+        KeyboardRow(keys = SymbolsLayout2.symbolsRow4, capsLockEnabled = CapsLockState.TEMPORARY, viewModel = viewModel)
         KeyboardRow(
             keys = SymbolsLayout2.getSymbolsRow5(keyboardState.isLatinLayout),
-            capsLockEnabled = CapsLockState.OFF,
+            capsLockEnabled = CapsLockState.TEMPORARY,
             viewModel = viewModel
         )
     }
