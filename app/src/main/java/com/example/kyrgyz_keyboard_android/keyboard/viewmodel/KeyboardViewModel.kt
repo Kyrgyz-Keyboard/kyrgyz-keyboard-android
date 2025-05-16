@@ -97,11 +97,16 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     fun onSuggestionSelected(suggestion: String) = viewModelScope.launch {
         _keyboardState.update { state ->
             state.copy(
+                justSelectedSuggestion = true,
                 inputBuffer = state.inputBuffer.dropLast(state.currentWord.length) + suggestion,
                 currentWord = "",
             )
         }
         updateSuggestions()
+    }
+
+    fun resetSuggestionSelectionFlag() {
+        _keyboardState.update { it.copy(justSelectedSuggestion = false) }
     }
 
     private fun handleSpace() {
@@ -156,9 +161,9 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         updateSuggestions()
     }
 }
-
 data class KeyboardState(
     val capsLockState: CapsLockState = CapsLockState.TEMPORARY,
+    val justSelectedSuggestion: Boolean = false,
     val currentWord: String = "",
     val inputBuffer: String = "",
     val isSymbolsMode: Boolean = false,

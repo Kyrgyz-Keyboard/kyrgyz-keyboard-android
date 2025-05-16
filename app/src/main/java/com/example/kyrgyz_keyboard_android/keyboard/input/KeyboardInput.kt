@@ -15,6 +15,7 @@ fun handleKeyClick(
     viewModel: KeyboardViewModel
 ) {
     val inputConnection = (context as? KyrgyzKeyboardIME)?.currentInputConnection ?: return
+    val keyboardState = viewModel.keyboardState.value
 
     when {
         key.img == R.drawable.ic_remove -> {
@@ -36,6 +37,19 @@ fun handleKeyClick(
             viewModel.onTextInput(" ")
         }
         !key.isSpecial && key.ch != null -> {
+            val isPunctuation = key.ch in ":;.,?!"
+            val justSelectedSuggestion = keyboardState.justSelectedSuggestion
+            
+            val textBeforeCursor = inputConnection.getTextBeforeCursor(1, 0)?.toString() ?: ""
+            val endsWithSpace = textBeforeCursor == " "
+            
+            if (isPunctuation && justSelectedSuggestion && endsWithSpace) {
+                inputConnection.deleteSurroundingText(1, 0)
+                viewModel.onBackspace()
+            }
+            
+            viewModel.resetSuggestionSelectionFlag()
+            
             val text = when (capsLockEnabled) {
                 CapsLockState.TEMPORARY, CapsLockState.LOCKED -> key.ch.uppercase()
                 else -> key.ch.lowercase()
@@ -68,14 +82,14 @@ fun handleSuggestionClick(
             keyboardState.currentWord.first().isUpperCase() && capsLockEnabled != CapsLockState.LOCKED
 
     val text = when {
-        shouldCapitalize || capsLockEnabled == CapsLockState.TEMPORARY -> 
+        shouldCapitalize || capsLockEnabled == CapsLockState.TEMPORARY ->
             suggestion.replaceFirstChar { it.uppercase() }
-        capsLockEnabled == CapsLockState.LOCKED -> 
+        capsLockEnabled == CapsLockState.LOCKED ->
             suggestion.uppercase()
-        else -> 
+        else ->
             suggestion.lowercase()
     }
-    
+
     inputConnection.commitText("$text ", 1)
     viewModel.onSuggestionSelected(suggestion)
 }
