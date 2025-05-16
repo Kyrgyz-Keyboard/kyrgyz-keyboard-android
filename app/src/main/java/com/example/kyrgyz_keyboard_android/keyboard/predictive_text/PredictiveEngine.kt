@@ -46,6 +46,9 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
 
     fun isReady(): Boolean = ready
 
+    fun reset() {
+    }
+
     override fun getPredictions(currentText: String): List<String> = try {
         trie.getSimpleWordPredictions(currentText, MAX_SUGGESTIONS)
     } catch (e: Exception) {

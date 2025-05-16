@@ -138,8 +138,17 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         updateSuggestions()
     }
 
-    companion object {
-        private const val MAX_SUGGESTIONS = 3
+    fun resetState() = viewModelScope.launch {
+        _keyboardState.update { state ->
+            state.copy(
+                currentWord = "",
+                inputBuffer = ""
+            )
+        }
+        
+        _suggestions.value = emptyList()
+        predictiveEngine.reset()
+        updateSuggestions()
     }
 }
 
