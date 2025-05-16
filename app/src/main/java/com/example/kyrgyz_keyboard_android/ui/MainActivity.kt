@@ -109,7 +109,7 @@ fun KeyboardSettingsScreen() {
         Text(
             "Арыба!\nЖаңы баскычтопту кармап көр!",
             fontSize = keyTextSize,
-            modifier = Modifier.padding(top = 150.dp)
+            modifier = Modifier.padding(top = 50.dp)
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -125,15 +125,18 @@ fun KeyboardSettingsScreen() {
             keyboardActions = KeyboardActions(onDone = { hideKeyboard(context) }),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(150.dp)
-                .weight(1f)
+                .height(200.dp),
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = 18.sp,
+                color = Color.Black
+            )
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(
             modifier = Modifier
-                .padding(bottom = 350.dp)
+                .padding(bottom = 50.dp)
                 .fillMaxWidth(),
             onClick = { switchToCustomKeyboard(context) },
             shape = RoundedCornerShape(Dimensions.keyCornerRadius)

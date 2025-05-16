@@ -58,6 +58,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
 
     fun toggleDictionaryMode() {
         _keyboardState.update { it.copy(isDictionaryMode = !it.isDictionaryMode) }
+        updateSuggestions()
     }
 
     fun updateCapsLockState(newState: CapsLockState) = viewModelScope.launch {
@@ -66,11 +67,16 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
 
     private fun updateSuggestions() = viewModelScope.launch {
         try {
+            if (_keyboardState.value.isDictionaryMode) {
+                _suggestions.value = emptyList()
+                return@launch
+            }
+            
             repeat(10) {
                 if (predictiveEngine.isReady()) return@repeat
                 kotlinx.coroutines.delay(50)
             }
-
+    
             val currentState = _keyboardState.value
             _suggestions.value = predictiveEngine.getPredictions(currentState.currentWord.lowercase())
         } catch (_: OutOfMemoryError) {
@@ -103,7 +109,8 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             state.copy(
                 justSelectedSuggestion = true,
                 inputBuffer = state.inputBuffer.dropLast(state.currentWord.length) + suggestion,
-                currentWord = "",
+                currentWord = ""
+//                capsLockState = CapsLockState.OFF
             )
         }
         updateSuggestions()

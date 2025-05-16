@@ -34,7 +34,7 @@ fun getDictionaryWords(): List<DictionaryWord> {
         // Fun words with similar spelling
         DictionaryWord("уулуу", "отравленный", KeyboardConstants.FUN_DICT),
         DictionaryWord("уулу", "сын", KeyboardConstants.FUN_DICT),
-        DictionaryWord("улуу", "великий/старший", KeyboardConstants.FUN_DICT),
+        DictionaryWord("улуу", "великий", KeyboardConstants.FUN_DICT),
         DictionaryWord("суулуу", "водный", KeyboardConstants.FUN_DICT),
         DictionaryWord("сулуу", "красивый", KeyboardConstants.FUN_DICT),
         DictionaryWord("сулу", "овес", KeyboardConstants.FUN_DICT),
