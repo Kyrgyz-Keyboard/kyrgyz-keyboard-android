@@ -19,8 +19,16 @@ object KeyboardConstants {
     const val ALPHA_CHARACTER = "абв"
     const val ENESAY_CHARACTER = "\uD803\uDC36\uD803\uDC3B\uD803\uDC0D\uD803\uDC03\uD803\uDC15"
 
-    const val LIGHT = "\uD83C\uDF11"
-    const val DARK = "\uD83C\uDF15"
+    const val LIGHT = "\uD83C\uDF18"
+//    const val LIGHT = "\uD83C\uDF11"
+//    const val DARK = "\uD83C\uDF15"
+    const val DARK = "\uD83C\uDF16"
+
+    // Dictionary Categories
+    const val COMMON_DICT = "Жалпы"
+    const val MONTH_DAY_DICT = "Айлар"
+    const val DAYS_DICT = "Жума"
+    const val FUN_DICT = "Чаташтырба"
 
     fun getSpaceCharacter(isLatinLayout: Boolean): String {
         return if (isLatinLayout) LATIN_SPACE else CYRILLIC_SPACE

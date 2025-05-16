@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.kyrgyz_keyboard_android.keyboard.dictionary.DictionaryLayout
 import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
 import com.example.kyrgyz_keyboard_android.keyboard.model.CyrillicUiLayout
 import com.example.kyrgyz_keyboard_android.keyboard.model.EnesayUiLayout
@@ -44,6 +45,12 @@ fun HomeScreen(viewModel: KeyboardViewModel = viewModel()) {
         )
 
         when {
+            keyboardState.isDictionaryMode -> {
+                DictionaryLayout(
+                    viewModel = viewModel,
+                    onClose = { viewModel.toggleDictionaryMode() }
+                )
+            }
             keyboardState.isSymbolsMode && keyboardState.isSymbolsLayout2 -> SymbolsLayout2(viewModel)
             keyboardState.isSymbolsMode -> SymbolsLayout(viewModel)
             else -> MainKeyboardLayout(keyboardState.capsLockState, viewModel, currentLayout)

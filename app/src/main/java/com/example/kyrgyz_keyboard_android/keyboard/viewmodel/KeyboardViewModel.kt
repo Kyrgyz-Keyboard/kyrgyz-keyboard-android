@@ -56,6 +56,10 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         _keyboardState.update { it.copy(isDarkMode = !it.isDarkMode) }
     }
 
+    fun toggleDictionaryMode() {
+        _keyboardState.update { it.copy(isDictionaryMode = !it.isDictionaryMode) }
+    }
+
     fun updateCapsLockState(newState: CapsLockState) = viewModelScope.launch {
         _keyboardState.update { it.copy(capsLockState = newState) }
     }
@@ -69,7 +73,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
 
             val currentState = _keyboardState.value
             _suggestions.value = predictiveEngine.getPredictions(currentState.currentWord.lowercase())
-        } catch (e: OutOfMemoryError) {
+        } catch (_: OutOfMemoryError) {
             _suggestions.value = emptyList()
         }
     }
@@ -164,6 +168,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
 data class KeyboardState(
     val capsLockState: CapsLockState = CapsLockState.TEMPORARY,
     val justSelectedSuggestion: Boolean = false,
+    val isDictionaryMode: Boolean = false,
     val currentWord: String = "",
     val inputBuffer: String = "",
     val isSymbolsMode: Boolean = false,
