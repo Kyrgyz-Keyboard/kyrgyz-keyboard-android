@@ -57,18 +57,32 @@ fun getDictionaryWords(): List<DictionaryWord> {
         DictionaryWord("ишемби", "суббота", KeyboardConstants.DAYS_DICT),
         DictionaryWord("жекшемби", "воскресенье", KeyboardConstants.DAYS_DICT),
 
+//        // Month names
+//        DictionaryWord("Жалган куран", "март - фальшивая косуля", KeyboardConstants.MONTH_DAY_DICT),
+//        DictionaryWord("Чын куран", "апрель - настоящая косуля", KeyboardConstants.MONTH_DAY_DICT),
+//        DictionaryWord("Бугу", "май - олень", KeyboardConstants.MONTH_DAY_DICT),
+//        DictionaryWord("Кулжа", "июнь - горный баран", KeyboardConstants.MONTH_DAY_DICT),
+//        DictionaryWord("Теке", "июль - горный козел", KeyboardConstants.MONTH_DAY_DICT),
+//        DictionaryWord("Баш оона", "август - начало", KeyboardConstants.MONTH_DAY_DICT),
+//        DictionaryWord("Аяк оона", "сентябрь - конец", KeyboardConstants.MONTH_DAY_DICT),
+//        DictionaryWord("Тогуздун айы", "октябрь - 9й месяц", KeyboardConstants.MONTH_DAY_DICT),
+//        DictionaryWord("Жетинин айы", "ноябрь - 7й месяц", KeyboardConstants.MONTH_DAY_DICT),
+//        DictionaryWord("Бештин айы", "декабрь - 5й месяц", KeyboardConstants.MONTH_DAY_DICT),
+//        DictionaryWord("Үчтүн айы", "январь - 3й месяц", KeyboardConstants.MONTH_DAY_DICT),
+//        DictionaryWord("Бирдин айы", "февраль - 1й месяц", KeyboardConstants.MONTH_DAY_DICT)
+
         // Month names
-        DictionaryWord("Жалган куран", "март - фальшивая косуля", KeyboardConstants.MONTH_DAY_DICT),
-        DictionaryWord("Чын куран", "апрель - настоящая косуля", KeyboardConstants.MONTH_DAY_DICT),
-        DictionaryWord("Бугу", "май - олень", KeyboardConstants.MONTH_DAY_DICT),
-        DictionaryWord("Кулжа", "июнь - горный баран", KeyboardConstants.MONTH_DAY_DICT),
-        DictionaryWord("Теке", "июль - горный козел", KeyboardConstants.MONTH_DAY_DICT),
-        DictionaryWord("Баш оона", "август - начало", KeyboardConstants.MONTH_DAY_DICT),
-        DictionaryWord("Аяк оона", "сентябрь - конец", KeyboardConstants.MONTH_DAY_DICT),
-        DictionaryWord("Тогуздун айы", "октябрь - 9й месяц", KeyboardConstants.MONTH_DAY_DICT),
-        DictionaryWord("Жетинин айы", "ноябрь - 7й месяц", KeyboardConstants.MONTH_DAY_DICT),
-        DictionaryWord("Бештин айы", "декабрь - 5й месяц", KeyboardConstants.MONTH_DAY_DICT),
-        DictionaryWord("Үчтүн айы", "январь - 3й месяц", KeyboardConstants.MONTH_DAY_DICT),
-        DictionaryWord("Бирдин айы", "февраль - 1й месяц", KeyboardConstants.MONTH_DAY_DICT)
+        DictionaryWord("Жалган куран", "март", KeyboardConstants.MONTH_DAY_DICT),
+        DictionaryWord("Чын куран", "апрель", KeyboardConstants.MONTH_DAY_DICT),
+        DictionaryWord("Бугу", "май", KeyboardConstants.MONTH_DAY_DICT),
+        DictionaryWord("Кулжа", "июнь", KeyboardConstants.MONTH_DAY_DICT),
+        DictionaryWord("Теке", "июль", KeyboardConstants.MONTH_DAY_DICT),
+        DictionaryWord("Баш оона", "август", KeyboardConstants.MONTH_DAY_DICT),
+        DictionaryWord("Аяк оона", "сентябрь", KeyboardConstants.MONTH_DAY_DICT),
+        DictionaryWord("Тогуздун айы", "октябрь", KeyboardConstants.MONTH_DAY_DICT),
+        DictionaryWord("Жетинин айы", "ноябрь", KeyboardConstants.MONTH_DAY_DICT),
+        DictionaryWord("Бештин айы", "декабрь", KeyboardConstants.MONTH_DAY_DICT),
+        DictionaryWord("Үчтүн айы", "январь", KeyboardConstants.MONTH_DAY_DICT),
+        DictionaryWord("Бирдин айы", "февраль", KeyboardConstants.MONTH_DAY_DICT)
     )
 }
