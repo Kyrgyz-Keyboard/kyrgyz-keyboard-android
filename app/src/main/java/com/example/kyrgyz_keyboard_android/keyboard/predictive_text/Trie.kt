@@ -7,7 +7,6 @@ import java.nio.MappedByteBuffer
 import java.util.Collections.synchronizedList
 
 const val RETURN_MARKER: Int = 1 shl 7
-const val STEM_MARKER: Int = 1 shl 6
 
 val DECODING_TABLE = listOf(
     ',', '.', ':'
@@ -26,17 +25,17 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
         private const val MAX_LAYERS = 4
     }
 
-    private val data = mutableMapOf<Pair<Boolean, Int>, MutableMap<*, *>>()
+    private val data = mutableMapOf<Int, MutableMap<*, *>>()
     // private val reverseIndex = words.mapIndexed { i, w -> i to w }.toMap()
 
     // fun print() {
-    //     fun dfs(node: MutableMap<Pair<Boolean, Int>, *>, depth: Int = 0) {
+    //     fun dfs(node: MutableMap<Int, *>, depth: Int = 0) {
     //         for ((key, childAny) in node) {
     //             @Suppress("UNCHECKED_CAST")
-    //             val child = childAny as? MutableMap<Pair<Boolean, Int>, *> ?: continue
-    //             val (isStem, index) = key
+    //             val child = childAny as? MutableMap<Int, *> ?: continue
+    //             val index = key
     //             val word = reverseIndex[index] ?: "<?>"
-    //             println("  ".repeat(depth) + "- $word (${if (isStem) "stem" else "step"})")
+    //             println("  ".repeat(depth) + "- $word")
     //             dfs(child, depth + 1)
     //         }
     //     }
@@ -143,7 +142,7 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
 
         Log.d("PredictiveEngine", "Trie is loading tree...")
         try {
-            val stack = ArrayDeque<Pair<MutableMap<Pair<Boolean, Int>, MutableMap<*, *>>, Int>>()
+            val stack = ArrayDeque<Pair<MutableMap<Int, MutableMap<*, *>>, Int>>()
             stack.addLast(data to 1)
 
             // while (stack.isNotEmpty()) {
@@ -160,12 +159,9 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
             //         continue
             //     }
             //
-            //     val isStem = (byte1 and STEM_MARKER) != 0
-            //     val high = byte1 and STEM_MARKER.inv()
-            //
-            //     val wordIndex = (high shl 16) or (input.get().toInt() shl 8) or input.get().toInt()
-            //     val child = mutableMapOf<Pair<Boolean, Int>, MutableMap<*, *>>()
-            //     current[Pair(isStem, wordIndex)] = child
+            //     val wordIndex = (byte1 shl 16) or (input.get().toInt() shl 8) or input.get().toInt()
+            //     val child = mutableMapOf<Int, MutableMap<*, *>>()
+            //     current[wordIndex] = child
             //
             //     if (layer < MAX_LAYERS) {
             //         stack.addLast(child to (layer + 1))
