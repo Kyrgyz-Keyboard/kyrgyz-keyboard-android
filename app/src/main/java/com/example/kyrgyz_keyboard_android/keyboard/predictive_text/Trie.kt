@@ -128,7 +128,7 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
             // }
             // Log.d("PredictiveEngine", "Trie load finished")
 
-        } catch (e: java.lang.OutOfMemoryError) {
+        } catch (e: OutOfMemoryError) {
             Log.e("PredictiveEngine", "Trie load failed: OutOfMemoryError", e)
         } catch (e: Exception) {
             Log.e("PredictiveEngine", "Trie load failed", e)

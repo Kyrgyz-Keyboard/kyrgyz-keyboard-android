@@ -2,10 +2,9 @@ package com.example.kyrgyz_keyboard_android.keyboard.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kyrgyz_keyboard_android.keyboard.predictive_text.PredictiveTextEngineImpl
 import com.example.kyrgyz_keyboard_android.keyboard.model.CapsLockState
+import com.example.kyrgyz_keyboard_android.keyboard.predictive_text.PredictiveTextEngineImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,18 +12,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class KeyboardViewModel(application: Application) : AndroidViewModel(application) {
-    private val predictiveEngine by lazy {
-        PredictiveTextEngineImpl(application)
-    }
+    private var predictiveEngine: PredictiveTextEngineImpl? = null
     private val _keyboardState = MutableStateFlow(KeyboardState())
     val keyboardState: StateFlow<KeyboardState> = _keyboardState.asStateFlow()
 
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
     val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
 
-//    init {
-//        updateSuggestions()
-//    }
+    init {
+        viewModelScope.launch {
+            predictiveEngine = PredictiveTextEngineImpl(application)
+            updateSuggestions()
+        }
+    }
 
     fun toggleKeyboardMode() = viewModelScope.launch {
         _keyboardState.update { it.copy(isSymbolsMode = !it.isSymbolsMode) }
@@ -66,13 +66,13 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
     private fun updateSuggestions() = viewModelScope.launch {
         try {
             repeat(10) {
-                if (predictiveEngine.isReady()) return@repeat
+                if (predictiveEngine?.isReady() == true) return@repeat
                 kotlinx.coroutines.delay(50)
             }
 
             val currentState = _keyboardState.value
-            val predictions = predictiveEngine.getPredictions(currentState.currentWord)
-            _suggestions.value = predictions
+            _suggestions.value =
+                predictiveEngine?.getPredictions(currentState.currentWord) ?: emptyList()
         } catch (e: OutOfMemoryError) {
             _suggestions.value = emptyList()
         }

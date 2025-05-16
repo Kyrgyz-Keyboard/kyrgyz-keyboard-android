@@ -5,7 +5,6 @@ import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import org.apertium.lttoolbox.process.FSTProcessor
 import java.io.StringReader
 
@@ -14,32 +13,34 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
     private var trie = Trie()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
+    companion object {
+        private const val MAX_SUGGESTIONS = 5
+    }
+
     @Volatile
     private var ready = false
 
     init {
-        scope.launch {
-            val kirAutomorfFile = copyAssetToFile(
-                context,
-                "kir.automorf.bin",
-                "kir.automorf_mapped.bin"
-            )
-            val kirAutomorfbuffer = mapFile(context, kirAutomorfFile)
-            fstp.load(kirAutomorfbuffer, "kir.automorf_mapped.bin")
-            fstp.initAnalysis()
-            if (!fstp.valid()) {
-                throw RuntimeException("Validity test for FSTProcessor failed")
-            }
+        val kirAutomorfFile = copyAssetToFile(
+            context,
+            "kir.automorf.bin",
+            "kir.automorf_mapped.bin"
+        )
+        val kirAutomorfbuffer = mapFile(context, kirAutomorfFile)
+        fstp.load(kirAutomorfbuffer, "kir.automorf_mapped.bin")
+        fstp.initAnalysis()
+        if (!fstp.valid()) {
+            throw RuntimeException("Validity test for FSTProcessor failed")
+        }
 
-            val trieFile = copyAssetToFile(context, "trie.bin", "trie_mapped.bin")
-            val trieBuffer = mapFile(context, trieFile)
-            try {
-                trie.load(trieBuffer) {
-                    ready = true
-                }
-            } catch (e: Exception) {
-                Log.e("PredictiveEngine", "Failed to load trie", e)
+        val trieFile = copyAssetToFile(context, "trie.bin", "trie_mapped.bin")
+        val trieBuffer = mapFile(context, trieFile)
+        try {
+            trie.load(trieBuffer) {
+                ready = true
             }
+        } catch (e: Exception) {
+            Log.e("PredictiveEngine", "Failed to load trie", e)
         }
     }
 
@@ -72,9 +73,5 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
     } catch (e: Exception) {
         Log.e("PredictiveEngine", "Error getting predictions for: $currentText", e)
         emptyList()
-    }
-
-    companion object {
-        private const val MAX_SUGGESTIONS = 5
     }
 }
