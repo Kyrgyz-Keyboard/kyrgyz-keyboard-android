@@ -16,6 +16,13 @@ val DECODING_TABLE = listOf(
     'ы', 'ь', 'э', 'ю', 'я', 'ң', 'ү', 'ө'
 )
 
+data class Quadruple<A, B, C, D>(
+    val first: A,
+    val second: B,
+    val third: C,
+    val fourth: D
+)
+
 val BYTE_TO_CHAR = DECODING_TABLE.mapIndexed { index, c -> (index + 1).toByte() to c }.toMap()
 
 class Trie(private val words: MutableList<String> = synchronizedList(mutableListOf())) {
@@ -23,6 +30,14 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
 
     companion object {
         private const val MAX_LAYERS = 4
+    }
+
+    private val wordsIndexed: Map<String, Int> = words.withIndex().associate { (index, word) ->
+        word to index
+    }
+
+    private val wordsIndexedReverse: Map<Int, String> = wordsIndexed.entries.associate { (word, index) ->
+        index to word
     }
 
     private val data = mutableMapOf<Int, MutableMap<*, *>>()
@@ -109,7 +124,67 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
             }
             .minOrNull() ?: word
     }
-
+    fun fetch(words: List<Pair<String, String>>, maxResults: Int = 10, logEnabled: Boolean = false): Sequence<Quadruple<Int, Int, Boolean, String>> = sequence {
+        fun log(vararg args: Any?) {
+            if (logEnabled) println(args.joinToString(" "))
+        }
+        fun fetchInner(curData: MutableMap<*, *>, startIndex: Int): Sequence<Pair<Pair<Boolean, Int>, Int>> = sequence {
+            if (startIndex == words.size) {
+                val results = curData.entries.mapNotNull { (k, v) ->
+                    @Suppress("UNCHECKED_CAST")
+                    val key = k as? Pair<Boolean, Int>
+                    val value = v as? Pair<Int, MutableMap<*, *>>
+                    if (key != null && value != null) key to value.first else null
+                }
+                println("Results: $results")
+                for ((key, freq) in results) {
+                    yield(key to freq)
+                }
+                return@sequence
+            }
+            val (word, apertiumWord) = words[startIndex]
+            wordsIndexed[apertiumWord]?.let { idx ->
+                val key = Pair(true, idx)
+                val value = curData[key] as? Pair<Int, MutableMap<*, *>>
+                if (value != null) {
+                    log("Word found on layer (apertium): \"$apertiumWord\"")
+                    yieldAll(fetchInner(value.second, startIndex + 1))
+                } else {
+                    log("Word not found on layer (apertium): \"$apertiumWord\"")
+                }
+            } ?: log("Unknown word (apertium): \"$apertiumWord\"")
+            wordsIndexed[word]?.let { idx ->
+                val key = Pair(false, idx)
+                val value = curData[key] as? Pair<Int, MutableMap<*, *>>
+                if (value != null) {
+                    log("Word found on layer (normal): \"$word\"")
+                    yieldAll(fetchInner(value.second, startIndex + 1))
+                } else {
+                    log("Word not found on layer (normal): \"$word\"")
+                }
+            } ?: log("Unknown word: \"$word\"")
+        }
+        val rawResults = mutableListOf<Quadruple<Int, Int, Boolean, Int>>()
+        for (layersNum in minOf(words.size + 1, Trie.MAX_LAYERS) downTo 2) {
+            log(layersNum, words.size - layersNum + 1)
+            val curLayer = data[layersNum - 1] ?: continue
+            val seq = fetchInner(curLayer, words.size - layersNum + 1)
+            for ((key, freq) in seq) {
+                val (isStem, prediction) = key
+                rawResults.add(Quadruple(layersNum, freq, isStem, prediction))
+            }
+        }
+        val distinctResults = mutableSetOf<Pair<Boolean, String>>()
+        for ((layersNum, freq, isStem, prediction) in rawResults) {
+            if (distinctResults.size == maxResults) return@sequence
+            val word = wordsIndexedReverse[prediction] ?: continue
+            val tag = Pair(isStem, word)
+            if (tag !in distinctResults) {
+                distinctResults.add(tag)
+                yield(Quadruple(layersNum, freq, isStem, word))
+            }
+        }
+    }
     private fun loadWords(count: Int, input: MappedByteBuffer) {
         val zeroByte = 0.toByte()
         repeat(count) {
@@ -145,29 +220,29 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
             val stack = ArrayDeque<Pair<MutableMap<Int, MutableMap<*, *>>, Int>>()
             stack.addLast(data to 1)
 
-            // while (stack.isNotEmpty()) {
-            //     val (current, layer) = stack.last()
-            //
-            //     if (layer == 1 && data.size % 100 == 0) {
-            //         Log.d("PredictiveEngine", "Words on layer 1: ${data.size}")
-            //         printMemoryUsage()
-            //     }
-            //
-            //     val byte1 = input.get().toInt()
-            //     if ((byte1 and RETURN_MARKER) != 0) {
-            //         stack.removeLast()
-            //         continue
-            //     }
-            //
-            //     val wordIndex = (byte1 shl 16) or (input.get().toInt() shl 8) or input.get().toInt()
-            //     val child = mutableMapOf<Int, MutableMap<*, *>>()
-            //     current[wordIndex] = child
-            //
-            //     if (layer < MAX_LAYERS) {
-            //         stack.addLast(child to (layer + 1))
-            //     }
-            // }
-            // Log.d("PredictiveEngine", "Trie load finished")
+             while (stack.isNotEmpty()) {
+                 val (current, layer) = stack.last()
+
+                 if (layer == 1 && data.size % 100 == 0) {
+                     Log.d("PredictiveEngine", "Words on layer 1: ${data.size}")
+                     printMemoryUsage()
+                 }
+
+                 val byte1 = input.get().toInt()
+                 if ((byte1 and RETURN_MARKER) != 0) {
+                     stack.removeLast()
+                     continue
+                 }
+
+                 val wordIndex = (byte1 shl 16) or (input.get().toInt() shl 8) or input.get().toInt()
+                 val child = mutableMapOf<Int, MutableMap<*, *>>()
+                 current[wordIndex] = child
+
+                 if (layer < MAX_LAYERS) {
+                     stack.addLast(child to (layer + 1))
+                 }
+             }
+             Log.d("PredictiveEngine", "Trie load finished")
 
         } catch (e: OutOfMemoryError) {
             Log.e("PredictiveEngine", "Trie load failed: OutOfMemoryError", e)
