@@ -1,6 +1,8 @@
 package com.example.kyrgyz_keyboard_android.keyboard.predictive_text
 
 import android.util.Log
+import org.apertium.lttoolbox.process.FSTProcessor
+import java.io.StringReader
 import java.nio.MappedByteBuffer
 import java.util.Collections.synchronizedList
 
@@ -18,6 +20,8 @@ val DECODING_TABLE = listOf(
 val BYTE_TO_CHAR = DECODING_TABLE.mapIndexed { index, c -> (index + 1).toByte() to c }.toMap()
 
 class Trie(private val words: MutableList<String> = synchronizedList(mutableListOf())) {
+    private val fstp = FSTProcessor()
+
     companion object {
         private const val MAX_LAYERS = 4
     }
@@ -70,6 +74,41 @@ class Trie(private val words: MutableList<String> = synchronizedList(mutableList
         }
         Log.d("PredictiveEngine", "Simple Word Prediction: $currentText -> $results")
         return results
+    }
+
+    fun loadFSTP(kirAutomorfbuffer: MappedByteBuffer, fileName: String) {
+        try {
+            fstp.load(kirAutomorfbuffer, fileName)
+            fstp.initAnalysis()
+            if (!fstp.valid()) {
+                throw RuntimeException("Validity test for FSTProcessor failed")
+            }
+            Log.d("PredictiveEngine", "FSTP loaded")
+        } catch (e: Exception) {
+            Log.e("PredictiveEngine", "Failed to load FSTP", e)
+        }
+    }
+
+    private fun getWordStem(word: String): String {
+        val output = StringBuilder()
+        try {
+            fstp.analysis(StringReader(word + '\n'), output)
+        } catch (e: Exception) {
+            Log.e("PredictiveEngine", "Error analyzing word: $word", e)
+            return word
+        }
+
+        return output.toString()
+            .removePrefix("^")
+            .removeSuffix("$")
+            .split("/")
+            .map { reading ->
+                reading.replace(" ", "").substringBefore("<")
+            }
+            .filter { base ->
+                !base.startsWith("*")
+            }
+            .minOrNull() ?: word
     }
 
     private fun loadWords(count: Int, input: MappedByteBuffer) {
