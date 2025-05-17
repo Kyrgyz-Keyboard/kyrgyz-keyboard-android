@@ -17,6 +17,11 @@ val DECODING_TABLE = listOf(
     'ы', 'ь', 'э', 'ю', 'я', 'ң', 'ү', 'ө'
 )
 
+val ALL_WORD_CHARS =
+    DECODING_TABLE.filter { it != ',' && it != '.' && it != ':' } +
+            DECODING_TABLE.filter { it != ',' && it != '.' && it != ':' }
+                .map { it.uppercaseChar() }
+
 val BYTE_TO_CHAR = DECODING_TABLE.mapIndexed { index, c -> (index + 1).toByte() to c }.toMap()
 
 class Trie {
@@ -114,6 +119,7 @@ class Trie {
     }
 
     fun fetch(text: String, maxResults: Int = 10): List<String> {
+        val isMidWord = text.lastOrNull()?.let { ALL_WORD_CHARS.contains(it) } ?: false
         val words: List<Pair<String, String>> = text.split(' ')
             .filter { it.isNotBlank() }
             .map { word ->
@@ -124,21 +130,32 @@ class Trie {
             sequence {
                 if (startIndex == words.size) {
                     // Log.d("PredictiveEngine", "Results: $results")
-                    for (key in curData.keys) {
-                        yield(key)
+                    for (prediction in curData.keys) {
+                        yield(prediction)
                     }
                     return@sequence
                 }
 
                 val (word, apertiumWord) = words[startIndex]
 
+                if (isMidWord && startIndex == words.size - 1) {
+                    // Log.d("PredictiveEngine", "Results: $results")
+                    for (wordIndex in curData.keys) {
+                        val prediction = wordsIndexedReverse[wordIndex]
+                        if (prediction.startsWith(word)) {
+                            yield(wordIndex)
+                        }
+                    }
+                    return@sequence
+                }
+
                 wordsIndexed[word]?.let { wordIndex ->
-                    val value = curData[wordIndex]
-                    if (value != null) {
+                    val nextLayer = curData[wordIndex]
+                    if (nextLayer != null) {
                         Log.d("PredictiveEngine", "Word found on layer (normal): \"$word\"")
                         yieldAll(
                             fetchInner(
-                                value as MutableMap<Int, MutableMap<*, *>>,
+                                nextLayer as MutableMap<Int, MutableMap<*, *>>,
                                 startIndex + 1
                             )
                         )
@@ -148,15 +165,15 @@ class Trie {
                 } ?: Log.d("PredictiveEngine", "Unknown word: \"$word\"")
 
                 wordsIndexed[apertiumWord]?.let { wordIndex ->
-                    val value = curData[wordIndex]
-                    if (value != null) {
+                    val nextLayer = curData[wordIndex]
+                    if (nextLayer != null) {
                         Log.d(
                             "PredictiveEngine",
                             "Word found on layer (apertium): \"$apertiumWord\""
                         )
                         yieldAll(
                             fetchInner(
-                                value as MutableMap<Int, MutableMap<*, *>>,
+                                nextLayer as MutableMap<Int, MutableMap<*, *>>,
                                 startIndex + 1
                             )
                         )
@@ -187,13 +204,6 @@ class Trie {
 
     private fun loadWords(count: Int, input: MappedByteBuffer) {
         val zeroByte = 0.toByte()
-
-        wordsIndexedReverse.clear()
-        wordsIndexed.clear()
-        repeat(WORD_INDEX_SHIFT) {
-            wordsIndexedReverse.add("")
-        }
-
         repeat(count) {
             val sb = StringBuilder()
             while (true) {
@@ -217,12 +227,18 @@ class Trie {
                 (countBytes[2].toInt() and 0xFF)
         Log.d("PredictiveEngine", "Trie has $wordCount words")
 
+        wordsIndexedReverse.clear()
+        wordsIndexed.clear()
+        repeat(WORD_INDEX_SHIFT) {
+            wordsIndexedReverse.add("")
+        }
+
         loadWords(100_000, input)
         onPreReady?.invoke()
         loadWords(wordCount - 100_000, input)
         Log.d(
             "PredictiveEngine",
-            "Trie loaded ${wordsIndexedReverse.size - WORD_INDEX_SHIFT} words"
+            "Trie loaded ${wordsIndexed.size} words"
         )
 
         printMemoryUsage()
@@ -235,7 +251,7 @@ class Trie {
             while (stack.isNotEmpty()) {
                 val (current, layer) = stack.last()
 
-                if (layer == 1 && data.size % 100 == 0) {
+                if (layer == 1 && data.size % 1000 == 0) {
                     Log.d("PredictiveEngine", "Words on layer 1: ${data.size}")
                     printMemoryUsage()
                 }
