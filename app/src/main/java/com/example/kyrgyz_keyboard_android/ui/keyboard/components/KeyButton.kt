@@ -82,12 +82,12 @@ fun KeyButton(
         }
     }
 
-    // LaunchedEffect(isKeyPressed) {
-    //     if (isKeyPressed) {
-    //         delay(10)
-    //         isKeyPressed = false
-    //     }
-    // }
+     LaunchedEffect(isKeyPressed) {
+         if (isKeyPressed) {
+             delay(10)
+             isKeyPressed = false
+         }
+     }
 
     Box(
         modifier = modifier
@@ -120,8 +120,8 @@ fun KeyButton(
                             key.ch == KeyboardConstants.SYMBOLS_CHARACTER -> viewModel.toggleKeyboardMode()
                             key.ch == KeyboardConstants.ALPHA_CHARACTER -> viewModel.toggleKeyboardMode()
                             key.ch == KeyboardConstants.ENESAY_CHARACTER -> viewModel.toggleEnesayLayout()
-                            key.ch == KeyboardConstants.LATIN_DICT || 
-                            key.ch == KeyboardConstants.CYRILLIC_DICT || 
+                            key.ch == KeyboardConstants.LATIN_DICT ||
+                            key.ch == KeyboardConstants.CYRILLIC_DICT ||
                             key.ch == KeyboardConstants.ENESAY_DICT -> {
                                 viewModel.toggleDictionaryMode()
                             }
