@@ -22,6 +22,7 @@ import com.example.kyrgyz_keyboard_android.ui.theme.keyboardTextStyle
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.sp
 import com.example.kyrgyz_keyboard_android.ui.theme.Dimensions
 import com.example.kyrgyz_keyboard_android.ui.theme.KeyboardGrayDark
 
@@ -77,7 +78,7 @@ fun SuggestionChip(text: String, isDarkMode: Boolean, onClick: () -> Unit) {
             contentAlignment = Alignment.Center
     ) {
         Text(
-            text = text, style = keyboardTextStyle, color = if (isDarkMode) Color.LightGray else Color.DarkGray
+            text = text, fontSize = 18.sp, style = keyboardTextStyle, color = if (isDarkMode) Color.LightGray else Color.DarkGray
         )
     }
 }

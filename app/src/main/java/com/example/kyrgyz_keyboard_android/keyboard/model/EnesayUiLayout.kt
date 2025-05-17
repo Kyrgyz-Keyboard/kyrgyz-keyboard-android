@@ -31,8 +31,8 @@ object EnesayUiLayout {
 
     val row3 = listOf(
         KeyUiModel(ch = "\uD803\uDC36", hint = "кы"),
-        KeyUiModel(ch = "\uD803\uDC38", hint = "ко|ку"),
-        KeyUiModel(ch = "\uD803\uDC1C", hint = "кө|кү"),
+        KeyUiModel(ch = "\uD803\uDC38", hint = "ко|y"),
+        KeyUiModel(ch = "\uD803\uDC1C", hint = "кө|ү"),
         KeyUiModel(ch = "\uD803\uDC1E", hint = "л"),
         KeyUiModel(ch = "\uD803\uDC21", hint = "лт"),
         KeyUiModel(ch = "\uD803\uDC22", hint = "м"),

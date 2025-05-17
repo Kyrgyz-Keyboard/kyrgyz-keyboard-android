@@ -2,10 +2,12 @@ package com.example.kyrgyz_keyboard_android.ui.keyboard
 
 import SuggestionsRow
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -39,10 +41,21 @@ fun HomeScreen(viewModel: KeyboardViewModel = viewModel()) {
     }
 
     KeyboardContainer(viewModel) {
-        SuggestionsRow(
-            suggestions = suggestions,
-            viewModel = viewModel,
-        )
+        if (!keyboardState.isDictionaryMode && !keyboardState.isSymbolsMode) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .background(if (keyboardState.isDarkMode) KeyboardGrayDark else KeyboardGray)
+            ) {
+                if (suggestions.isNotEmpty()) {
+                    SuggestionsRow(
+                        suggestions = suggestions,
+                        viewModel = viewModel,
+                    )
+                }
+            }
+        }
 
         when {
             keyboardState.isDictionaryMode -> {
