@@ -5,6 +5,7 @@ import org.apertium.lttoolbox.process.FSTProcessor
 import java.io.StringReader
 import java.nio.MappedByteBuffer
 import java.util.Collections.synchronizedList
+import java.util.Collections.synchronizedMap
 
 const val RETURN_MARKER: Int = 1 shl 7
 
@@ -18,7 +19,11 @@ val DECODING_TABLE = listOf(
 
 val BYTE_TO_CHAR = DECODING_TABLE.mapIndexed { index, c -> (index + 1).toByte() to c }.toMap()
 
-class Trie(private val wordsIndexedReverse: MutableList<String> = synchronizedList(mutableListOf())) {
+class Trie {
+    private val wordsIndexed: MutableMap<String, Int> = synchronizedMap(mutableMapOf())
+    private val wordsIndexedReverse: MutableList<String> = synchronizedList(mutableListOf())
+    private val data = mutableMapOf<Int, MutableMap<*, *>>()
+
     private val fstp = FSTProcessor()
 
     companion object {
@@ -26,15 +31,7 @@ class Trie(private val wordsIndexedReverse: MutableList<String> = synchronizedLi
         private const val WORD_INDEX_SHIFT = 1
     }
 
-    // private val wordsIndexedReverse: Map<Int, String> =
-    //     wordsIndexed.entries.associate { (word, index) ->
-    //         index to word
-    //     }
-
-    private val data = mutableMapOf<Int, MutableMap<*, *>>()
-    // private val reverseIndex = words.mapIndexed { i, w -> i to w }.toMap()
-
-    // fun print() {
+    // fun getData() {
     //     fun dfs(node: MutableMap<Int, *>, depth: Int = 0) {
     //         for ((key, childAny) in node) {
     //             @Suppress("UNCHECKED_CAST")
@@ -136,23 +133,33 @@ class Trie(private val wordsIndexedReverse: MutableList<String> = synchronizedLi
                 val (word, apertiumWord) = words[startIndex]
 
                 wordsIndexed[word]?.let { wordIndex ->
-                    val value = curData[wordIndex] as MutableMap<Int, MutableMap<*, *>>
+                    val value = curData[wordIndex]
                     if (value != null) {
                         Log.d("PredictiveEngine", "Word found on layer (normal): \"$word\"")
-                        yieldAll(fetchInner(value, startIndex + 1))
+                        yieldAll(
+                            fetchInner(
+                                value as MutableMap<Int, MutableMap<*, *>>,
+                                startIndex + 1
+                            )
+                        )
                     } else {
                         Log.d("PredictiveEngine", "Word not found on layer (normal): \"$word\"")
                     }
                 } ?: Log.d("PredictiveEngine", "Unknown word: \"$word\"")
 
                 wordsIndexed[apertiumWord]?.let { wordIndex ->
-                    val value = curData[wordIndex] as MutableMap<Int, MutableMap<*, *>>
+                    val value = curData[wordIndex]
                     if (value != null) {
                         Log.d(
                             "PredictiveEngine",
                             "Word found on layer (apertium): \"$apertiumWord\""
                         )
-                        yieldAll(fetchInner(value, startIndex + 1))
+                        yieldAll(
+                            fetchInner(
+                                value as MutableMap<Int, MutableMap<*, *>>,
+                                startIndex + 1
+                            )
+                        )
                     } else {
                         Log.d(
                             "PredictiveEngine",
@@ -182,6 +189,7 @@ class Trie(private val wordsIndexedReverse: MutableList<String> = synchronizedLi
         val zeroByte = 0.toByte()
 
         wordsIndexedReverse.clear()
+        wordsIndexed.clear()
         repeat(WORD_INDEX_SHIFT) {
             wordsIndexedReverse.add("")
         }
@@ -193,7 +201,9 @@ class Trie(private val wordsIndexedReverse: MutableList<String> = synchronizedLi
                 if (b == zeroByte) break
                 sb.append(BYTE_TO_CHAR[b])
             }
-            wordsIndexedReverse.add(sb.toString())
+            val word = sb.toString()
+            wordsIndexed[word] = it + WORD_INDEX_SHIFT
+            wordsIndexedReverse.add(word)
         }
     }
 
