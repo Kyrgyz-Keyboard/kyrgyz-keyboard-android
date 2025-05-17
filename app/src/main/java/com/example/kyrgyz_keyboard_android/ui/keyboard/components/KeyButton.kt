@@ -81,12 +81,12 @@ fun KeyButton(
         }
     }
 
-    LaunchedEffect(isKeyPressed) {
-        if (isKeyPressed) {
-            delay(10)
-            isKeyPressed = false
-        }
-    }
+    // LaunchedEffect(isKeyPressed) {
+    //     if (isKeyPressed) {
+    //         delay(10)
+    //         isKeyPressed = false
+    //     }
+    // }
 
     Box(
         modifier = modifier
@@ -98,12 +98,10 @@ fun KeyButton(
                 detectTapGestures(
                     onPress = {
                         isKeyPressed = true
-                        
+
                         when {
                             key.img == R.drawable.ic_remove -> {
                                 isBackspacePressed = true
-                                tryAwaitRelease()
-                                isBackspacePressed = false
                             }
                             key.img == R.drawable.ic_globe -> {
                                 when {
@@ -127,11 +125,14 @@ fun KeyButton(
                             }
                             else -> handleKeyClick(key, capsLockEnabled, context, viewModel)
                         }
+                        tryAwaitRelease()
+                        isBackspacePressed = false
+                        isKeyPressed = false
                     },
                     onTap = {
                         if (key.img == R.drawable.ic_caps) {
                             val currentTime = System.currentTimeMillis()
-                            if (waitingForSecondTap && currentTime - firstTapTime < 300) {
+                            if (waitingForSecondTap && currentTime - firstTapTime < 500) {
                                 viewModel.updateCapsLockState(CapsLockState.LOCKED)
                                 waitingForSecondTap = false
                             } else {

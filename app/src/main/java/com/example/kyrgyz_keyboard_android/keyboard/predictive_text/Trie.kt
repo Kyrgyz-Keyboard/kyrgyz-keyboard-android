@@ -204,16 +204,16 @@ class Trie {
 
     private fun loadWords(count: Int, input: MappedByteBuffer) {
         val zeroByte = 0.toByte()
+        val sb = StringBuilder()
         repeat(count) {
-            val sb = StringBuilder()
             while (true) {
                 val b = input.get()
                 if (b == zeroByte) break
                 sb.append(BYTE_TO_CHAR[b])
             }
-            val word = sb.toString()
-            wordsIndexed[word] = it + WORD_INDEX_SHIFT
-            wordsIndexedReverse.add(word)
+            wordsIndexed[sb.toString()] = it + WORD_INDEX_SHIFT
+            wordsIndexedReverse.add(sb.toString())
+            sb.clear()
         }
     }
 
@@ -235,11 +235,9 @@ class Trie {
 
         loadWords(100_000, input)
         onPreReady?.invoke()
+        Log.d("PredictiveEngine", "Trie loaded ${wordsIndexed.size} words")
         loadWords(wordCount - 100_000, input)
-        Log.d(
-            "PredictiveEngine",
-            "Trie loaded ${wordsIndexed.size} words"
-        )
+        Log.d("PredictiveEngine", "Trie loaded ${wordsIndexed.size} words")
 
         printMemoryUsage()
 
