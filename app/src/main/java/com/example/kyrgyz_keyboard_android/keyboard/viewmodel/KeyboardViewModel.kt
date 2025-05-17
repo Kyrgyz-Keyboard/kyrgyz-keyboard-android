@@ -130,7 +130,8 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
                 currentWord = "",
                 inputBuffer = state.currentWord,
                 capsLockState = CapsLockState.OFF,
-                hadTextBefore = true
+                hadTextBefore = true,
+                justSelectedSuggestion = true
             )
         }
         
