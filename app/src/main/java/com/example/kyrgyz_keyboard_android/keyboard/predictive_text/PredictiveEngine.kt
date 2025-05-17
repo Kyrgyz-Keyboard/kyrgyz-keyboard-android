@@ -48,10 +48,22 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
 
     fun reset() {}
 
-    override fun getPredictions(currentText: String): List<String> = try {
-        trie.getSimpleWordPredictions(currentText, MAX_SUGGESTIONS)
-    } catch (e: Exception) {
-        Log.e("PredictiveEngine", "Error getting predictions for: $currentText", e)
-        emptyList()
+    override fun getPredictions(inputText: String): List<String> {
+        return try {
+            val limitedText = if (inputText.length > 1000) inputText.takeLast(1000) else inputText
+            
+            val lastWord = limitedText.split(Regex("\\s+")).lastOrNull()?.trim() ?: ""
+
+            val predictions = trie.getSimpleWordPredictions(lastWord, MAX_SUGGESTIONS)
+            
+            if (predictions.isEmpty()) {
+                emptyList()
+            } else {
+                predictions
+            }
+        } catch (e: Exception) {
+            Log.e("PredictiveEngine", "Error getting predictions for: $inputText", e)
+            emptyList()
+        }
     }
 }

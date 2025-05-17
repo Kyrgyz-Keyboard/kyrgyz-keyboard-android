@@ -78,7 +78,21 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             }
     
             val currentState = _keyboardState.value
-            _suggestions.value = predictiveEngine.getPredictions(currentState.currentWord.lowercase())
+            val textToPredict = currentState.inputBuffer
+            
+            if (textToPredict.isEmpty()) {
+                if (currentState.hadTextBefore) {
+                    _suggestions.value = emptyList()
+                } else {
+                    _suggestions.value = listOf("мен", "сен", "биз", "силер", "бул")
+                }
+            } else {
+                _suggestions.value = predictiveEngine.getPredictions(textToPredict.lowercase())
+                
+                if (!currentState.hadTextBefore) {
+                    _keyboardState.update { it.copy(hadTextBefore = true) }
+                }
+            }
         } catch (_: OutOfMemoryError) {
             _suggestions.value = emptyList()
         }
@@ -106,13 +120,20 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
 
     fun onSuggestionSelected(suggestion: String) = viewModelScope.launch {
         _keyboardState.update { state ->
+            val newInputBuffer = if (state.currentWord.isEmpty()) {
+                state.inputBuffer + suggestion
+            } else {
+                state.inputBuffer.dropLast(state.currentWord.length) + suggestion
+            }
+            
             state.copy(
-                justSelectedSuggestion = true,
-                inputBuffer = state.inputBuffer.dropLast(state.currentWord.length) + suggestion,
-                currentWord = ""
-//                capsLockState = CapsLockState.OFF
+                currentWord = "",
+                inputBuffer = newInputBuffer,
+                capsLockState = CapsLockState.OFF,
+                hadTextBefore = true
             )
         }
+        
         updateSuggestions()
     }
 
@@ -163,7 +184,8 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
         _keyboardState.update { state ->
             state.copy(
                 currentWord = "",
-                inputBuffer = ""
+                inputBuffer = "",
+                hadTextBefore = false
             )
         }
         
@@ -182,5 +204,6 @@ data class KeyboardState(
     val isSymbolsLayout2: Boolean = false,
     val isLatinLayout: Boolean = false,
     val isEnesayLayout: Boolean = false,
-    val isDarkMode: Boolean = false
+    val isDarkMode: Boolean = false,
+    val hadTextBefore: Boolean = false
 )
