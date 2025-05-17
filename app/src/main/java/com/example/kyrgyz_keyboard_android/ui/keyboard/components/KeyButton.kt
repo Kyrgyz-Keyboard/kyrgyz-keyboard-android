@@ -1,5 +1,6 @@
 package com.example.kyrgyz_keyboard_android.ui.keyboard.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -98,6 +99,7 @@ fun KeyButton(
                 detectTapGestures(
                     onPress = {
                         isKeyPressed = true
+                        Log.d("PredictiveEngine", "Key pressed: ${key.ch}")
 
                         when {
                             key.img == R.drawable.ic_remove -> {
@@ -125,7 +127,10 @@ fun KeyButton(
                             }
                             else -> handleKeyClick(key, capsLockEnabled, context, viewModel)
                         }
+                        Log.d("PredictiveEngine", "Waiting for key to release")
                         tryAwaitRelease()
+                        // TODO Вообще работает но только самое первое нажатие после установки нет
+                        Log.d("PredictiveEngine", "Key released: ${key.ch}")
                         isBackspacePressed = false
                         isKeyPressed = false
                     },

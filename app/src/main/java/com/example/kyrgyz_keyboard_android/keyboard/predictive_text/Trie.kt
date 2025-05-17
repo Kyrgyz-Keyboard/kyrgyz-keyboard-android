@@ -64,24 +64,23 @@ class Trie {
         )
     }
 
-    // fun getSimpleWordPredictions(currentText: String, maxResults: Int): List<String> {
-    //     val currentWords = currentText.split(' ').filter { it.isNotBlank() }
-    //     if (currentWords.isEmpty()) return emptyList()
-    //
-    //     val results = mutableListOf<String>()
-    //     synchronized(wordsIndexedReverse) {
-    //         for (word in wordsIndexedReverse) {
-    //             if (word.startsWith(currentWords.last())) {
-    //                 results.add(word)
-    //                 if (results.size >= maxResults) {
-    //                     break
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     Log.d("PredictiveEngine", "Simple Word Prediction: $currentText -> $results")
-    //     return results
-    // }
+    fun getSimpleWordPredictions(text: String, maxResults: Int): List<String> {
+        val lastWord = text.split(' ').filter { it.isNotBlank() }.lastOrNull() ?: return emptyList()
+
+        val results = mutableListOf<String>()
+        synchronized(wordsIndexedReverse) {
+            for (word in wordsIndexedReverse) {
+                if (word.startsWith(lastWord)) {
+                    results.add(word)
+                    if (results.size >= maxResults) {
+                        break
+                    }
+                }
+            }
+        }
+        Log.d("PredictiveEngine", "Simple Word Prediction: $text -> $results")
+        return results
+    }
 
     fun loadFSTP(kirAutomorfbuffer: MappedByteBuffer, fileName: String) {
         try {
@@ -199,6 +198,23 @@ class Trie {
             }
         }
 
+        Log.d("PredictiveEngine", "Normal Predictions: $text -> $distinctResults")
+
+        if (distinctResults.size < maxResults) {
+            val lastWord =
+                text.split(' ').filter { it.isNotBlank() }.lastOrNull() ?: return emptyList()
+
+            synchronized(wordsIndexedReverse) {
+                for (word in wordsIndexedReverse) {
+                    if (word.startsWith(lastWord)) {
+                        distinctResults.add(word)
+                        if (distinctResults.size == maxResults) break
+                    }
+                }
+            }
+            Log.d("PredictiveEngine", "Including Simple Word Prediction: $text -> $distinctResults")
+        }
+
         return distinctResults.toList()
     }
 
@@ -241,40 +257,45 @@ class Trie {
 
         printMemoryUsage()
 
-        Log.d("PredictiveEngine", "Trie is loading tree...")
-        try {
-            val stack = ArrayDeque<Pair<MutableMap<Int, MutableMap<*, *>>, Int>>()
-            stack.addLast(data to 1)
-
-            while (stack.isNotEmpty()) {
-                val (current, layer) = stack.last()
-
-                if (layer == 1 && data.size % 1000 == 0) {
-                    Log.d("PredictiveEngine", "Words on layer 1: ${data.size}")
-                    printMemoryUsage()
-                }
-
-                val byte1 = input.get().toInt()
-                if ((byte1 and RETURN_MARKER) != 0) {
-                    stack.removeLast()
-                    continue
-                }
-
-                val wordIndex = (byte1 shl 16) or (input.get().toInt() shl 8) or input.get().toInt()
-                val child = mutableMapOf<Int, MutableMap<*, *>>()
-                current[wordIndex] = child
-
-                if (layer < MAX_LAYERS) {
-                    stack.addLast(child to (layer + 1))
-                }
-            }
-            Log.d("PredictiveEngine", "Trie load finished")
-
-        } catch (e: OutOfMemoryError) {
-            Log.e("PredictiveEngine", "Trie load failed: OutOfMemoryError", e)
-        } catch (e: Exception) {
-            Log.e("PredictiveEngine", "Trie load failed", e)
-        }
+        // Log.d("PredictiveEngine", "Trie is loading tree...")
+        // try {
+        //     val stack = ArrayDeque<Pair<MutableMap<Int, MutableMap<*, *>>, Int>>()
+        //     stack.addLast(data to 1)
+        //
+        //     while (stack.isNotEmpty()) {
+        //         val (current, layer) = stack.last()
+        //
+        //         if (layer == 1 && data.size % 1000 == 0) {
+        //             Log.d("PredictiveEngine", "Words on layer 1: ${data.size}")
+        //             printMemoryUsage()
+        //         }
+        //
+        //         val byte1 = input.get().toInt()
+        //         if ((byte1 and RETURN_MARKER) != 0) {
+        //             stack.removeLast()
+        //             continue
+        //         }
+        //
+        //         val byte2 = input.get().toInt()
+        //         val byte3 = input.get().toInt()
+        //         val wordIndex = (byte1 shl 16) or (byte2 shl 8) or byte3
+        //         // assert(0 <= wordIndex && wordIndex < wordsIndexed.size) {
+        //         //     "Word index out of bounds: $wordIndex (${Integer.toBinaryString(byte1).padStart(8, '0')}|${Integer.toBinaryString(byte2).padStart(8, '0')}|${Integer.toBinaryString(byte3).padStart(8, '0')})"
+        //         // }
+        //         val child = mutableMapOf<Int, MutableMap<*, *>>()
+        //         current[wordIndex] = child
+        //
+        //         if (layer < MAX_LAYERS) {
+        //             stack.addLast(child to (layer + 1))
+        //         }
+        //     }
+        //     Log.d("PredictiveEngine", "Trie load finished")
+        //
+        // } catch (e: OutOfMemoryError) {
+        //     Log.e("PredictiveEngine", "Trie load failed: OutOfMemoryError", e)
+        // } catch (e: Exception) {
+        //     Log.e("PredictiveEngine", "Trie load failed", e)
+        // }
 
         printMemoryUsage()
     }
