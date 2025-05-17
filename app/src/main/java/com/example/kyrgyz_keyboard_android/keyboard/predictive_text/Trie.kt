@@ -64,23 +64,23 @@ class Trie {
         )
     }
 
-    fun getSimpleWordPredictions(text: String, maxResults: Int): List<String> {
-        val lastWord = text.split(' ').filter { it.isNotBlank() }.lastOrNull() ?: return emptyList()
-
-        val results = mutableListOf<String>()
-        synchronized(wordsIndexedReverse) {
-            for (word in wordsIndexedReverse) {
-                if (word.startsWith(lastWord)) {
-                    results.add(word)
-                    if (results.size >= maxResults) {
-                        break
-                    }
-                }
-            }
-        }
-        Log.d("PredictiveEngine", "Simple Word Prediction: $text -> $results")
-        return results
-    }
+    // fun getSimpleWordPredictions(text: String, maxResults: Int): List<String> {
+    //     val lastWord = text.split(' ').filter { it.isNotBlank() }.lastOrNull() ?: return emptyList()
+    //
+    //     val results = mutableListOf<String>()
+    //     synchronized(wordsIndexedReverse) {
+    //         for (word in wordsIndexedReverse) {
+    //             if (word.startsWith(lastWord)) {
+    //                 results.add(word)
+    //                 if (results.size >= maxResults) {
+    //                     break
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     Log.d("PredictiveEngine", "Simple Word Prediction: $text -> $results")
+    //     return results
+    // }
 
     fun loadFSTP(kirAutomorfbuffer: MappedByteBuffer, fileName: String) {
         try {
@@ -187,20 +187,20 @@ class Trie {
 
         val distinctResults = mutableSetOf<String>()
 
-        for (layersNum in minOf(words.size + 1, MAX_LAYERS) downTo 2) {
-            // Log.d("PredictiveEngine", "$layersNum, ${words.size - layersNum + 1}")
-            for (prediction in fetchInner(data, words.size - layersNum + 1)) {
-                val word = wordsIndexedReverse[prediction]
-                if (word !in distinctResults) {
-                    distinctResults.add(word)
-                    if (distinctResults.size == maxResults) break
-                }
-            }
-        }
+        // for (layersNum in minOf(words.size + 1, MAX_LAYERS) downTo 2) {
+        //     // Log.d("PredictiveEngine", "$layersNum, ${words.size - layersNum + 1}")
+        //     for (prediction in fetchInner(data, words.size - layersNum + 1)) {
+        //         val word = wordsIndexedReverse[prediction]
+        //         if (word !in distinctResults) {
+        //             distinctResults.add(word)
+        //             if (distinctResults.size == maxResults) break
+        //         }
+        //     }
+        // }
 
         Log.d("PredictiveEngine", "Normal Predictions: $text -> $distinctResults")
 
-        if (distinctResults.size < maxResults) {
+        if (isMidWord && distinctResults.size < maxResults) {
             val lastWord =
                 text.split(' ').filter { it.isNotBlank() }.lastOrNull() ?: return emptyList()
 
@@ -270,18 +270,13 @@ class Trie {
         //             printMemoryUsage()
         //         }
         //
-        //         val byte1 = input.get().toInt()
-        //         if ((byte1 and RETURN_MARKER) != 0) {
+        //         val byte1 = input.get()
+        //         if ((byte1.toInt() and RETURN_MARKER) != 0) {
         //             stack.removeLast()
         //             continue
         //         }
         //
-        //         val byte2 = input.get().toInt()
-        //         val byte3 = input.get().toInt()
-        //         val wordIndex = (byte1 shl 16) or (byte2 shl 8) or byte3
-        //         // assert(0 <= wordIndex && wordIndex < wordsIndexed.size) {
-        //         //     "Word index out of bounds: $wordIndex (${Integer.toBinaryString(byte1).padStart(8, '0')}|${Integer.toBinaryString(byte2).padStart(8, '0')}|${Integer.toBinaryString(byte3).padStart(8, '0')})"
-        //         // }
+        //         val wordIndex = (byte1.toUByte().toInt() shl 16) or (input.get().toUByte().toInt() shl 8) or input.get().toUByte().toInt()
         //         val child = mutableMapOf<Int, MutableMap<*, *>>()
         //         current[wordIndex] = child
         //

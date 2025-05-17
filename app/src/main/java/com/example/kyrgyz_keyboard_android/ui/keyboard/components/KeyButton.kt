@@ -99,7 +99,7 @@ fun KeyButton(
                 detectTapGestures(
                     onPress = {
                         isKeyPressed = true
-                        Log.d("PredictiveEngine", "Key pressed: ${key.ch}")
+                        // Log.d("PredictiveEngine", "Key pressed: ${key.ch}")
 
                         when {
                             key.img == R.drawable.ic_remove -> {
@@ -127,10 +127,10 @@ fun KeyButton(
                             }
                             else -> handleKeyClick(key, capsLockEnabled, context, viewModel)
                         }
-                        Log.d("PredictiveEngine", "Waiting for key to release")
+                        // Log.d("PredictiveEngine", "Waiting for key to release")
                         tryAwaitRelease()
                         // TODO Вообще работает но только самое первое нажатие после установки нет
-                        Log.d("PredictiveEngine", "Key released: ${key.ch}")
+                        // Log.d("PredictiveEngine", "Key released: ${key.ch}")
                         isBackspacePressed = false
                         isKeyPressed = false
                     },
