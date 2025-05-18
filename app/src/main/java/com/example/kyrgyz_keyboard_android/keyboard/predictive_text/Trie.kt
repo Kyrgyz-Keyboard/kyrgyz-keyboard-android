@@ -1,6 +1,9 @@
 package com.example.kyrgyz_keyboard_android.keyboard.predictive_text
 
+import android.util.ArrayMap
 import android.util.Log
+import android.util.SparseArray
+import androidx.core.util.size
 import org.apertium.lttoolbox.process.FSTProcessor
 import java.io.StringReader
 import java.nio.MappedByteBuffer
@@ -27,7 +30,7 @@ val BYTE_TO_CHAR = DECODING_TABLE.mapIndexed { index, c -> (index + 1).toByte() 
 class Trie {
     private val wordsIndexed: MutableMap<String, Int> = synchronizedMap(mutableMapOf())
     private val wordsIndexedReverse: MutableList<String> = synchronizedList(mutableListOf())
-    private val data = mutableMapOf<Int, MutableMap<*, *>>()
+    private val data = SparseArray<SparseArray<*>>()
 
     private val fstp = FSTProcessor()
 
@@ -125,12 +128,12 @@ class Trie {
                 Pair(word, getWordStem(word))
             }
 
-        fun fetchInner(curData: MutableMap<Int, MutableMap<*, *>>, startIndex: Int): Sequence<Int> =
+        fun fetchInner(curData: SparseArray<SparseArray<*>>, startIndex: Int): Sequence<Int> =
             sequence {
                 if (startIndex == words.size) {
                     // Log.d("PredictiveEngine", "Results: $results")
-                    for (prediction in curData.keys) {
-                        yield(prediction)
+                    for (index in 0 until curData.size()) {
+                        yield(curData.keyAt(index))
                     }
                     return@sequence
                 }
@@ -139,7 +142,8 @@ class Trie {
 
                 if (isMidWord && startIndex == words.size - 1) {
                     // Log.d("PredictiveEngine", "Results: $results")
-                    for (wordIndex in curData.keys) {
+                    for (index in 0 until curData.size) {
+                        val wordIndex = curData.keyAt(index)
                         val prediction = wordsIndexedReverse[wordIndex]
                         if (prediction.startsWith(word)) {
                             yield(wordIndex)
@@ -154,7 +158,7 @@ class Trie {
                         Log.d("PredictiveEngine", "Word found on layer (normal): \"$word\"")
                         yieldAll(
                             fetchInner(
-                                nextLayer as MutableMap<Int, MutableMap<*, *>>,
+                                nextLayer as SparseArray<SparseArray<*>>,
                                 startIndex + 1
                             )
                         )
@@ -172,7 +176,7 @@ class Trie {
                         )
                         yieldAll(
                             fetchInner(
-                                nextLayer as MutableMap<Int, MutableMap<*, *>>,
+                                nextLayer as SparseArray<SparseArray<*>>,
                                 startIndex + 1
                             )
                         )
@@ -187,16 +191,14 @@ class Trie {
 
         val distinctResults = mutableSetOf<String>()
 
-        // for (layersNum in minOf(words.size + 1, MAX_LAYERS) downTo 2) {
-        //     // Log.d("PredictiveEngine", "$layersNum, ${words.size - layersNum + 1}")
-        //     for (prediction in fetchInner(data, words.size - layersNum + 1)) {
-        //         val word = wordsIndexedReverse[prediction]
-        //         if (word !in distinctResults) {
-        //             distinctResults.add(word)
-        //             if (distinctResults.size == maxResults) break
-        //         }
-        //     }
-        // }
+        for (layersNum in minOf(words.size + 1, MAX_LAYERS) downTo 2) {
+            Log.d("PredictiveEngine", "$layersNum, ${words.size - layersNum + 1}")
+            for (prediction in fetchInner(data, words.size - layersNum + 1)) {
+                distinctResults.add(wordsIndexedReverse[prediction])
+                if (distinctResults.size >= maxResults) break
+            }
+            if (distinctResults.size >= maxResults) break
+        }
 
         Log.d("PredictiveEngine", "Normal Predictions: $text -> $distinctResults")
 
@@ -257,40 +259,47 @@ class Trie {
 
         printMemoryUsage()
 
-        // Log.d("PredictiveEngine", "Trie is loading tree...")
-        // try {
-        //     val stack = ArrayDeque<Pair<MutableMap<Int, MutableMap<*, *>>, Int>>()
-        //     stack.addLast(data to 1)
-        //
-        //     while (stack.isNotEmpty()) {
-        //         val (current, layer) = stack.last()
-        //
-        //         if (layer == 1 && data.size % 1000 == 0) {
-        //             Log.d("PredictiveEngine", "Words on layer 1: ${data.size}")
-        //             printMemoryUsage()
-        //         }
-        //
-        //         val byte1 = input.get()
-        //         if ((byte1.toInt() and RETURN_MARKER) != 0) {
-        //             stack.removeLast()
-        //             continue
-        //         }
-        //
-        //         val wordIndex = (byte1.toUByte().toInt() shl 16) or (input.get().toUByte().toInt() shl 8) or input.get().toUByte().toInt()
-        //         val child = mutableMapOf<Int, MutableMap<*, *>>()
-        //         current[wordIndex] = child
-        //
-        //         if (layer < MAX_LAYERS) {
-        //             stack.addLast(child to (layer + 1))
-        //         }
-        //     }
-        //     Log.d("PredictiveEngine", "Trie load finished")
-        //
-        // } catch (e: OutOfMemoryError) {
-        //     Log.e("PredictiveEngine", "Trie load failed: OutOfMemoryError", e)
-        // } catch (e: Exception) {
-        //     Log.e("PredictiveEngine", "Trie load failed", e)
-        // }
+        Log.d("PredictiveEngine", "Trie is loading tree...")
+        try {
+            val stack = ArrayDeque<Pair<SparseArray<SparseArray<*>>, Int>>()
+            stack.addLast(data to 1)
+
+            var byte1: Byte
+            var wordIndex: Int
+            var child: SparseArray<SparseArray<*>>
+            var layer: Int
+
+            while (stack.isNotEmpty()) {
+                byte1 = input.get()
+                if ((byte1.toInt() and RETURN_MARKER) != 0) {
+                    stack.removeLast()
+                    continue
+                }
+
+                child = SparseArray()
+                wordIndex = (byte1.toUByte().toInt() shl 16) or
+                        (input.get().toUByte().toInt() shl 8) or
+                        input.get().toUByte().toInt()
+                stack.last().first[wordIndex] = child
+
+                layer = stack.last().second
+
+                if (layer == 1 && data.size % 10_000 == 0) {
+                    Log.d("PredictiveEngine", "Words on layer 1: ${data.size}")
+                    printMemoryUsage()
+                }
+
+                if (layer < MAX_LAYERS) {
+                    stack.addLast(child to (layer + 1))
+                }
+            }
+            Log.d("PredictiveEngine", "Trie load finished")
+
+        } catch (e: OutOfMemoryError) {
+            Log.e("PredictiveEngine", "Trie load failed: OutOfMemoryError", e)
+        } catch (e: Exception) {
+            Log.e("PredictiveEngine", "Trie load failed", e)
+        }
 
         printMemoryUsage()
     }
