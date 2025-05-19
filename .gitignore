@@ -1,14 +1,14 @@
 # JetBrains IDE
-/.idea/
+.idea/
 
 # Kotlin
-/.kotlin/
+.kotlin/
 
 # Gradle
-/.gradle/
+.gradle/
 
 # Other local files
-/local.properties
+local.properties
 
 # Build
-/build/
+build/
