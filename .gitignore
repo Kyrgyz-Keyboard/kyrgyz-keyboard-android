@@ -12,3 +12,4 @@ local.properties
 
 # Build
 build/
+app/src/main/java/com/example/kyrgyz_keyboard_android/keyboard/predictive_text/WordFilter.kt
