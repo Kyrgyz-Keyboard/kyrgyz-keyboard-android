@@ -78,7 +78,11 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             }
     
             val currentState = _keyboardState.value
-            val textToPredict = currentState.inputBuffer
+            val textToPredict = if (currentState.currentWord.isNotEmpty()) {
+                currentState.currentWord
+            } else {
+                ""
+            }
             
             if (textToPredict.isEmpty()) {
                 if (currentState.hadTextBefore) {
@@ -128,7 +132,7 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
             
             state.copy(
                 currentWord = "",
-                inputBuffer = state.currentWord,
+                inputBuffer = newInputBuffer,
                 capsLockState = CapsLockState.OFF,
                 hadTextBefore = true,
                 justSelectedSuggestion = true

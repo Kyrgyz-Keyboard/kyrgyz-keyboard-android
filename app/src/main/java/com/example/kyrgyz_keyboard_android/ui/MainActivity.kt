@@ -107,7 +107,7 @@ fun KeyboardSettingsScreen() {
             .padding(16.dp), verticalArrangement = Arrangement.Center
     ) {
         Text(
-            "Арыба!\nЖаңы баскычтопту кармап көр!",
+            "Арыбагыла!\nЖаңы баскычтобун колдонуп көрүңүз!",
             fontSize = keyTextSize,
             modifier = Modifier.padding(top = 50.dp)
         )
@@ -141,7 +141,7 @@ fun KeyboardSettingsScreen() {
             onClick = { switchToCustomKeyboard(context) },
             shape = RoundedCornerShape(Dimensions.keyCornerRadius)
         ) {
-            Text("Кыргыз баскычтоптусуна өтүү")
+            Text("Кыргыз баскычтобуна өтүү")
         }
     }
 }

@@ -50,7 +50,9 @@ class PredictiveTextEngineImpl(context: Context) : PredictiveTextEngine {
 
     override fun getPredictions(currentText: String): List<String> {
         return try {
-            trie.fetch(currentText.takeLast(200), MAX_SUGGESTIONS)
+            val currentWord = currentText.substringAfterLast(' ').trim()
+            val rawPredictions = trie.fetch(currentWord, MAX_SUGGESTIONS)
+            WordFilter.filterPredictions(currentWord, rawPredictions)
         } catch (e: Exception) {
             Log.e("PredictiveEngine", "Error getting predictions for: $currentText", e)
             emptyList()
