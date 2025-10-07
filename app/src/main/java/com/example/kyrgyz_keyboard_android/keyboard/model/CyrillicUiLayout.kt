@@ -24,6 +24,7 @@ object CyrillicUiLayout {
         KeyUiModel(ch = "н"),
         KeyUiModel(ch = "г"),
         KeyUiModel(ch = "ш"),
+        KeyUiModel(ch = "щ"),
         KeyUiModel(ch = "з"),
         KeyUiModel(ch = "х")
     )
