@@ -1,6 +1,5 @@
 package com.example.kyrgyz_keyboard_android.ui.keyboard.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -150,6 +149,12 @@ fun KeyButton(
                             }
                         }
                     }
+//                    onLongPress = {
+//                        val alt = LongPressAlternates.getAlternate(key.ch, viewModel.keyboardState.value)
+//                        if (!key.isSpecial && alt != null) {
+//                            handleKeyClick(key.copy(ch = alt), capsLockEnabled, context, viewModel)
+//                        }
+//                    }
                 )
             },
         contentAlignment = Alignment.Center

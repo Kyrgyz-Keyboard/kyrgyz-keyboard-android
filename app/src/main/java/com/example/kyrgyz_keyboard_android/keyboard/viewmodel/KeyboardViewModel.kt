@@ -18,8 +18,9 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
 
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
     val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
+    private var suggestionsEnabled: Boolean = false
 
-     init {
+    init {
          updateSuggestions()
      }
 
@@ -67,6 +68,10 @@ class KeyboardViewModel(application: Application) : AndroidViewModel(application
 
     private fun updateSuggestions() = viewModelScope.launch {
         try {
+            if (!suggestionsEnabled) {
+                _suggestions.value = emptyList()
+                return@launch
+            }
             if (_keyboardState.value.isDictionaryMode) {
                 _suggestions.value = emptyList()
                 return@launch

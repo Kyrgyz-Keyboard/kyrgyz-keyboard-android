@@ -41,19 +41,17 @@ fun HomeScreen(viewModel: KeyboardViewModel = viewModel()) {
     }
 
     KeyboardContainer(viewModel) {
-        if (!keyboardState.isDictionaryMode && !keyboardState.isSymbolsMode) {
+        if (!keyboardState.isDictionaryMode && !keyboardState.isSymbolsMode && suggestions.isNotEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
                     .background(if (keyboardState.isDarkMode) KeyboardGrayDark else KeyboardGray)
             ) {
-                if (suggestions.isNotEmpty()) {
-                    SuggestionsRow(
-                        suggestions = suggestions,
-                        viewModel = viewModel,
-                    )
-                }
+                SuggestionsRow(
+                    suggestions = suggestions,
+                    viewModel = viewModel,
+                )
             }
         }
 
